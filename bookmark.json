@@ -1,0 +1,194 @@
+[
+    {
+        "family_name": "Apps Quota Xtra Combo Plus 1GB",
+        "family_code": "8080ddcf-18c5-4d6d-86a4-89eb8ca5f2d1",
+        "is_enterprise": null,
+        "variant_name": "Bonus Xtra Combo Plus 1GB",
+        "option_name": "Kuota Malam 72GB",
+        "order": 26
+    },
+    {
+        "family_name": "Kuota Aplikasi Xtra Combo Plus 6GB",
+        "family_code": "5412b964-474e-42d3-9c86-f5692da627db",
+        "is_enterprise": null,
+        "variant_name": "Bonus Xtra Combo Plus 6GB",
+        "option_name": "WhatsApp 1GB",
+        "order": 210
+    },
+    {
+        "family_name": "Kuota Aplikasi Xtra Combo Plus 6GB",
+        "family_code": "5412b964-474e-42d3-9c86-f5692da627db",
+        "is_enterprise": null,
+        "variant_name": "Bonus Xtra Combo Plus 6GB",
+        "option_name": "TikTok 1GB",
+        "order": 211
+    },
+    {
+        "family_name": "Kuota Aplikasi Xtra Combo Plus 6GB",
+        "family_code": "5412b964-474e-42d3-9c86-f5692da627db",
+        "is_enterprise": null,
+        "variant_name": "Bonus Xtra Combo Plus 6GB",
+        "option_name": "YouTube 1GB",
+        "order": 212
+    },
+    {
+        "family_name": "Kuota Aplikasi Xtra Combo Plus 6GB",
+        "family_code": "5412b964-474e-42d3-9c86-f5692da627db",
+        "is_enterprise": null,
+        "variant_name": "Bonus Xtra Combo Plus 6GB",
+        "option_name": "WhatsApp 750MB",
+        "order": 213
+    },
+    {
+        "family_name": "Kuota Aplikasi Xtra Combo Plus 6GB",
+        "family_code": "5412b964-474e-42d3-9c86-f5692da627db",
+        "is_enterprise": null,
+        "variant_name": "Bonus Xtra Combo Plus 6GB",
+        "option_name": "TikTok 750MB",
+        "order": 214
+    },
+    {
+        "family_name": "Kuota Aplikasi Xtra Combo Plus 6GB",
+        "family_code": "5412b964-474e-42d3-9c86-f5692da627db",
+        "is_enterprise": null,
+        "variant_name": "Bonus Xtra Combo Plus 6GB",
+        "option_name": "YouTube 750MB",
+        "order": 215
+    },
+    {
+        "family_name": "Kuota Aplikasi Xtra Combo Plus 6GB",
+        "family_code": "5412b964-474e-42d3-9c86-f5692da627db",
+        "is_enterprise": null,
+        "variant_name": "Bonus Xtra Combo Plus 6GB",
+        "option_name": "WhatsApp 750MB",
+        "order": 216
+    },
+    {
+        "family_name": "Kuota Aplikasi Xtra Combo Plus 6GB",
+        "family_code": "5412b964-474e-42d3-9c86-f5692da627db",
+        "is_enterprise": null,
+        "variant_name": "Bonus Xtra Combo Plus 6GB",
+        "option_name": "TikTok 750MB",
+        "order": 217
+    },
+    {
+        "family_name": "Kuota Aplikasi Xtra Combo Plus 6GB",
+        "family_code": "5412b964-474e-42d3-9c86-f5692da627db",
+        "is_enterprise": null,
+        "variant_name": "Bonus Xtra Combo Plus 6GB",
+        "option_name": "YouTube 750MB",
+        "order": 218
+    },
+    {
+        "family_name": "Xtra Combo Plus",
+        "family_code": "23b71540-8785-4abe-816d-e9b4efa48f95",
+        "is_enterprise": null,
+        "variant_name": "Reguler",
+        "option_name": "5GB",
+        "order": 9
+    },
+    {
+        "family_name": "Xtra Combo Mini",
+        "family_code": "ad176860-49d4-4bdd-9161-ab38dc6a631b",
+        "is_enterprise": null,
+        "variant_name": "7 Days",
+        "option_name": "2GB",
+        "order": 4
+    },
+    {
+        "family_name": "Xtra Combo Mini",
+        "family_code": "ad176860-49d4-4bdd-9161-ab38dc6a631b",
+        "is_enterprise": null,
+        "variant_name": "7 Days",
+        "option_name": "9GB",
+        "order": 1
+    },
+    {
+        "family_name": "Xtra Combo Plus",
+        "family_code": "23b71540-8785-4abe-816d-e9b4efa48f95",
+        "is_enterprise": null,
+        "variant_name": "Reguler",
+        "option_name": "9GB",
+        "order": 8
+    },
+    {
+        "family_name": "Work & School",
+        "family_code": "5d63dddd-4f90-4f4c-8438-2f005c20151f",
+        "is_enterprise": null,
+        "variant_name": "Work & School",
+        "option_name": "Education 15GB",
+        "order": 4
+    },
+    {
+        "family_name": "Work & School",
+        "family_code": "5d63dddd-4f90-4f4c-8438-2f005c20151f",
+        "is_enterprise": null,
+        "variant_name": "Work & School",
+        "option_name": "Education 5GB",
+        "order": 5
+    },
+    {
+        "family_name": "Work & School",
+        "family_code": "5d63dddd-4f90-4f4c-8438-2f005c20151f",
+        "is_enterprise": null,
+        "variant_name": "Work & School",
+        "option_name": "Education 2GB",
+        "order": 6
+    },
+    {
+        "family_name": "Daily Bonus Quota",
+        "family_code": "1134d040-52f8-4889-8682-2f200b7b9d03",
+        "is_enterprise": null,
+        "variant_name": "Daily Bonus Quota",
+        "option_name": "Daily Bonus Quota",
+        "order": 1
+    },
+    {
+        "family_name": "Bonus XL Circle",
+        "family_code": "6bda0cc4-2f7d-4613-a82d-1edbbb9c4500",
+        "is_enterprise": null,
+        "variant_name": "Bonus XL Circle",
+        "option_name": "Welcome Bonus XL Circle",
+        "order": 1
+    },
+    {
+        "family_name": "Bonus XL Circle",
+        "family_code": "6bda0cc4-2f7d-4613-a82d-1edbbb9c4500",
+        "is_enterprise": null,
+        "variant_name": "Bonus XL Circle",
+        "option_name": "Circle Quota",
+        "order": 2
+    },
+    {
+        "family_name": "Bonus XL Circle",
+        "family_code": "6bda0cc4-2f7d-4613-a82d-1edbbb9c4500",
+        "is_enterprise": null,
+        "variant_name": "Bonus XL Circle",
+        "option_name": "Bonus Family Quota",
+        "order": 3
+    },
+    {
+        "family_name": "Bonus XL Circle",
+        "family_code": "6bda0cc4-2f7d-4613-a82d-1edbbb9c4500",
+        "is_enterprise": null,
+        "variant_name": "Bonus XL Circle",
+        "option_name": "Welcome Bonus XL Circle",
+        "order": 4
+    },
+    {
+        "family_name": "Bonus XL Circle",
+        "family_code": "6bda0cc4-2f7d-4613-a82d-1edbbb9c4500",
+        "is_enterprise": null,
+        "variant_name": "Bonus XL Circle",
+        "option_name": "Bonus Kuota Circle",
+        "order": 5
+    },
+    {
+        "family_name": "Kuota Bersama Prepaid",
+        "family_code": "434a1449-1d18-43f8-b059-10b3d5e3f5c3",
+        "is_enterprise": null,
+        "variant_name": "Kuota Bersama Prepaid",
+        "option_name": "Kuota Bersama 100GB",
+        "order": 1
+    }
+]
