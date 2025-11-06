@@ -39,7 +39,7 @@ def ensure_git():
     root_path = os.path.dirname(os.path.abspath(__file__))
     git_folder = os.path.join(root_path, ".git")
     git_config = os.path.join(git_folder, "config")
-    expected_url = "https://github.com/ros3xbot/test2"
+    expected_url = "https://github.com/kcepu877/xr"
 
     if not os.path.exists(git_folder):
         text = Text()
