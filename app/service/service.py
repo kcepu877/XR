@@ -23,7 +23,7 @@ def decrypt_base64(encoded_data: str) -> dict:
     except Exception:
         return {"is_unlocked": False}
 
-def load_unlock_status():
+def load_status():
     if not os.path.exists(is_anu):
         return {"is_unlocked": False}
     try:
@@ -33,7 +33,7 @@ def load_unlock_status():
     except Exception:
         return {"is_unlocked": False}
 
-def save_unlock_status(status: bool):
+def save_status(status: bool):
     try:
         encoded = encrypt_base64({"is_unlocked": status})
         with open(is_anu, "w") as f:

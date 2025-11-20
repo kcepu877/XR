@@ -1,7 +1,6 @@
-import json
 import os
+import json
 from typing import List, Dict
-
 
 class Bookmark:
     _instance = None
@@ -53,20 +52,20 @@ class Bookmark:
         self._save(self.packages)
 
     def add_bookmark(
-            self,
-            family_code: str,
-            family_name: str,
-            is_enterprise: bool,
-            variant_name: str,
-            option_name: str,
-            order: int,
+        self,
+        family_code: str,
+        family_name: str,
+        is_enterprise: bool,
+        variant_name: str,
+        option_name: str,
+        order: int,
     ) -> bool:
         """Add a bookmark if it does not already exist."""
         key = (family_code, variant_name, order)
 
         if any(
-                (p["family_code"], p["variant_name"], p["order"]) == key
-                for p in self.packages
+            (p["family_code"], p["variant_name"], p["order"]) == key
+            for p in self.packages
         ):
             print("Bookmark already exists.")
             return False
@@ -86,19 +85,19 @@ class Bookmark:
         return True
 
     def remove_bookmark(
-            self,
-            family_code: str,
-            is_enterprise: bool,
-            variant_name: str,
-            order: int,
+        self,
+        family_code: str,
+        is_enterprise: bool,
+        variant_name: str,
+        order: int,
     ) -> bool:
         """Remove a bookmark if it exists. Returns True if removed."""
         for i, p in enumerate(self.packages):
             if (
-                    p["family_code"] == family_code
-                    and p["is_enterprise"] == is_enterprise
-                    and p["variant_name"] == variant_name
-                    and p["order"] == order
+                p["family_code"] == family_code
+                and p["is_enterprise"] == is_enterprise
+                and p["variant_name"] == variant_name
+                and p["order"] == order
             ):
                 del self.packages[i]
                 self.save_bookmark()
@@ -110,6 +109,5 @@ class Bookmark:
     def get_bookmarks(self) -> List[Dict]:
         """Return all bookmarks."""
         return self.packages.copy()
-
 
 BookmarkInstance = Bookmark()
