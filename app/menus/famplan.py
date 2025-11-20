@@ -1,7 +1,7 @@
 from datetime import datetime
 import json
 from app.menus.util import pause, clear_screen, format_quota_byte
-from app.client.engsel2 import get_family_data, change_member, remove_member, set_quota_limit, validate_msisdn
+from app.client.famplan import get_family_data, change_member, remove_member, set_quota_limit, validate_msisdn
 
 WIDTH = 55
 
@@ -50,6 +50,7 @@ def show_family_info(api_key: str, tokens: dict):
             if msisdn == "":
                 formatted_msisdn = "<Empty Slot>"
             
+            alias = member.get("alias", "N/A")
             slot_id = member.get("slot_id", "N/A")
             family_member_id = member.get("family_member_id", "N/A")
             member_type = member.get("member_type", "N/A")
@@ -58,11 +59,14 @@ def show_family_info(api_key: str, tokens: dict):
             quota_allocated_byte = member.get("usage", {}).get("quota_allocated", 0)
             formated_quota_allocated = format_quota_byte(quota_allocated_byte)
             
+            add_chances = member.get("add_chances", 0)
+            total_add_chances = member.get("total_add_chances", 0)
+            
             quota_used_byte = member.get("usage", {}).get("quota_used", 0)
             formated_quota_used = format_quota_byte(quota_used_byte)
             
             end_date = datetime.fromtimestamp(end_date_ts).strftime("%Y-%m-%d") if end_date_ts else "N/A"
-            print(f"{idx}. {formatted_msisdn} ({member_type})")
+            print(f"{idx}. {formatted_msisdn} ({alias}) | {member_type} | Add Chances: {add_chances}/{total_add_chances}")
             print(f"   Usage: {formated_quota_used} / {formated_quota_allocated}")
         print("-" * WIDTH)
         print("")
@@ -107,8 +111,8 @@ def show_family_info(api_key: str, tokens: dict):
                 
                 # Checking MSISDN
                 validation_res = validate_msisdn(api_key, tokens, target_msisdn)
-                if validation_res.get("status") != "SUCCESS":
-                    print(f"MSISDN validation failed: {validation_res.get('message', 'Unknown error')}")
+                if validation_res.get("status").lower() != "success":
+                    print(f"MSISDN validation failed: {json.dumps(validation_res, indent=2)}")
                     pause()
                     return
                 print("MSISDN validation successful.")

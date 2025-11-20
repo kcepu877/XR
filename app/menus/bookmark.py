@@ -1,18 +1,17 @@
-from app.client.engsel import get_family, get_package_details
-from app.menus.package import show_package_details
-from app.service.auth import AuthInstance
-from app.menus.util import clear_screen, pause
-from app.menus.util_helper import print_panel
-from app.service.bookmark import BookmarkInstance
-from app.config.theme_config import get_theme
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
-from rich.box import MINIMAL_DOUBLE_HEAD
 from rich.align import Align
+from rich.box import MINIMAL_DOUBLE_HEAD
+
+from app.service.auth import AuthInstance
+from app.menus.util import clear_screen, pause, print_panel
+from app.service.bookmark import BookmarkInstance
+from app.client.engsel import get_family
+from app.menus.package import show_package_details, get_package_details
+from app.config.theme_config import get_theme
 
 console = Console()
-
 
 def show_bookmark_menu(return_package_detail: bool = False):
     api_key = AuthInstance.api_key
@@ -30,7 +29,7 @@ def show_bookmark_menu(return_package_detail: bool = False):
 
         bookmarks = BookmarkInstance.get_bookmarks()
         if not bookmarks:
-            print_panel("Info", "Tidak ada bookmark tersimpan.")
+            print_panel("ℹ️ Info", "Tidak ada bookmark tersimpan.")
             pause()
             return (None, None) if return_package_detail else None
 
@@ -47,8 +46,8 @@ def show_bookmark_menu(return_package_detail: bool = False):
         nav = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
         nav.add_column(justify="right", style=theme["text_key"], width=6)
         nav.add_column(justify="left", style=theme["text_body"])
-        nav.add_row("00", f"[{theme['text_sub']}]Kembali ke menu awal[/]")
-        nav.add_row("000", f"[{theme['text_err']}]Hapus Bookmark[/]")
+        nav.add_row("00", f"[{theme['text_sub']}]⬅️ Kembali ke menu awal[/]")
+        nav.add_row("000", f"[{theme['text_err']}]🗑️ Hapus Bookmark[/]")
 
         console.print(Panel(nav, border_style=theme["border_info"], expand=True))
 

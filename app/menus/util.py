@@ -1,23 +1,13 @@
-import app.menus.banner as banner
-ascii_art = banner.load("https://raw.githubusercontent.com/kcepu877/izin/main/international-genetically-engineered-machine-e-coli-thumb-genetic-engineering-logo-others-40a9b6e44224a22410234bb0d722ef03.png", globals())
-ascii_art = banner.load("https://raw.githubusercontent.com/kcepu877/izin/main/international-genetically-engineered-machine-e-coli-thumb-genetic-engineering-logo-others-40a9b6e44224a22410234bb0d722ef03.png", globals())
-import requests
 from html.parser import HTMLParser
-
 import os
-import textwrap
 import re
-from html.parser import HTMLParser
-from datetime import datetime
-from app.config.theme_config import get_theme
-from app.service.auth import AuthInstance
-from app.client.engsel import get_balance, get_profile
+import textwrap
 from rich.console import Console
 from rich.panel import Panel
-from rich.align import Align
 from rich.table import Table
+from rich.align import Align
 from rich import box
-from app.menus.util_helper import print_panel, get_rupiah
+from app.config.theme_config import get_theme, get_theme_style
 
 console = Console()
 
@@ -25,7 +15,7 @@ console = Console()
 def print_banner():
     theme = get_theme()
     banner_text = Align.center(
-        "[bold]myXL CLI v8.8.0 gen.Z[/]",
+        "[bold]myXL CLI v8.9.1 sunset[/]",
         vertical="middle"
     )
     console.print(Panel(
@@ -36,26 +26,88 @@ def print_banner():
         expand=True,
         box=box.DOUBLE
     ))
-    show_simple_number_panel()
 
-def clear_sc():
-    print("Clearing screen...")
-    os.system('cls' if os.name == 'nt' else 'clear')
-    if ascii_art:
-        ascii_art.to_terminal(columns=55)
-    print_banner()
+def simple_number():
+    from app.service.auth import AuthInstance
+    theme = get_theme()
+    active_user = AuthInstance.get_active_user()
+
+    if not active_user:
+        text = f"[bold {get_theme_style('text_err')}]Tidak ada akun aktif saat ini.[/]"
+    else:
+        number = active_user.get("number", "-")
+        text = f"[bold {get_theme_style('text_body')}]Akun (nomor) aktif ✨ {number} ✨[/]"
+
+    console.print(Panel(
+        Align.center(text),
+        border_style=get_theme_style("border_warning"),
+        padding=(0, 0),
+        expand=True
+    ))
 
 def clear_screen():
     print("Clearing screen...")
     os.system('cls' if os.name == 'nt' else 'clear')
-    if ascii_art:
-        ascii_art.to_terminal(columns=55)
+    ascii_art = r"""
+            _____                    _____          
+           /\    \                  /\    \         
+          /::\____\                /::\    \        
+         /::::|   |               /::::\    \       
+        /:::::|   |              /::::::\    \      
+       /::::::|   |             /:::/\:::\    \     
+      /:::/|::|   |            /:::/__\:::\    \    
+     /:::/ |::|   |           /::::\   \:::\    \   
+    /:::/  |::|___|______    /::::::\   \:::\    \  
+   /:::/   |::::::::\    \  /:::/\:::\   \:::\    \ 
+  /:::/    |:::::::::\____\/:::/__\:::\   \:::\____\
+  \::/    / ~~~~~/:::/    /\:::\   \:::\   \::/    /
+   \/____/      /:::/    /  \:::\   \:::\   \/____/ 
+               /:::/    /    \:::\   \:::\    \     
+              /:::/    /      \:::\   \:::\____\    
+             /:::/    /        \:::\   \::/    /    
+            /:::/    /          \:::\   \/____/     
+           /:::/    /            \:::\    \         
+          /:::/    /              \:::\____\        
+          \::/    /                \::/    /        
+           \/____/                  \/____/         
+"""
+
+    print(ascii_art)
+    print_banner()
+    simple_number()
+
+def clear_sc():
+    print("Clearing screen...")
+    os.system('cls' if os.name == 'nt' else 'clear')
+    ascii_art = r"""
+            _____                    _____          
+           /\    \                  /\    \         
+          /::\____\                /::\    \        
+         /::::|   |               /::::\    \       
+        /:::::|   |              /::::::\    \      
+       /::::::|   |             /:::/\:::\    \     
+      /:::/|::|   |            /:::/__\:::\    \    
+     /:::/ |::|   |           /::::\   \:::\    \   
+    /:::/  |::|___|______    /::::::\   \:::\    \  
+   /:::/   |::::::::\    \  /:::/\:::\   \:::\    \ 
+  /:::/    |:::::::::\____\/:::/__\:::\   \:::\____\
+  \::/    / ~~~~~/:::/    /\:::\   \:::\   \::/    /
+   \/____/      /:::/    /  \:::\   \:::\   \/____/ 
+               /:::/    /    \:::\   \:::\    \     
+              /:::/    /      \:::\   \:::\____\    
+             /:::/    /        \:::\   \::/    /    
+            /:::/    /          \:::\   \/____/     
+           /:::/    /            \:::\    \         
+          /:::/    /              \:::\____\        
+          \::/    /                \::/    /        
+           \/____/                  \/____/         
+"""
+
+    print(ascii_art)
     print_banner()
 
 def pause():
-    theme = get_theme()
-    console.print(f"\n[bold {theme['border_info']}]Tekan Enter untuk melanjutkan...[/]")
-    input()
+    input("\nPress enter to continue...")
 
 class HTMLToText(HTMLParser):
     def __init__(self, width=80):
@@ -84,31 +136,16 @@ class HTMLToText(HTMLParser):
                 self.result.append(text)
 
     def get_text(self):
+        # Join and clean multiple newlines
         text = "".join(self.result)
         text = re.sub(r"\n\s*\n\s*\n+", "\n\n", text)
+        # Wrap lines nicely
         return "\n".join(textwrap.wrap(text, width=self.width, replace_whitespace=False))
 
 def display_html(html_text, width=80):
     parser = HTMLToText(width=width)
     parser.feed(html_text)
     return parser.get_text()
-
-def show_simple_number_panel():
-    theme = get_theme()
-    active_user = AuthInstance.get_active_user()
-
-    if not active_user:
-        text = f"[bold {theme['text_err']}]Tidak ada akun aktif saat ini.[/]"
-    else:
-        number = active_user.get("number", "-")
-        text = f"[bold {theme['text_body']}]Akun yang sedang aktif ✨ {number} ✨[/]"
-
-    console.print(Panel(
-        Align.center(text),
-        border_style=theme["border_warning"],
-        padding=(0, 0),
-        expand=True
-    ))
 
 def format_quota_byte(quota_byte: int) -> str:
     GB = 1024 ** 3 
@@ -123,3 +160,65 @@ def format_quota_byte(quota_byte: int) -> str:
         return f"{quota_byte / KB:.2f} KB"
     else:
         return f"{quota_byte} B"
+
+def get_rupiah(value) -> str:
+    value_str = str(value).strip()
+    value_str = re.sub(r"^Rp\s?", "", value_str)
+    match = re.match(r"([\d,]+)(.*)", value_str)
+    if not match:
+        return value_str
+
+    raw_number = match.group(1).replace(",", "")
+    suffix = match.group(2).strip()
+
+    try:
+        number = int(raw_number)
+    except ValueError:
+        return value_str
+
+    formatted_number = f"{number:,}".replace(",", ".")
+    formatted = f"{formatted_number},-"
+    return f"{formatted} {suffix}" if suffix else formatted
+
+def nav_range(label: str, count: int) -> str:
+    if count <= 0:
+        return f"{label} (tidak tersedia)"
+    if count == 1:
+        return f"{label} (1)"
+    return f"{label} (1–{count})"
+
+def live_loading(text: str, theme: dict):
+    return console.status(f"[{theme['text_sub']}]{text}[/{theme['text_sub']}]", spinner="dots")
+
+def print_panel(title, content, border_style=None):
+    style = border_style or get_theme_style("border_info")
+    console.print(Panel(content, title=title, title_align="left", border_style=style))
+
+def print_success(title, content):
+    console.print(Panel(content, title=title, title_align="left", border_style=get_theme_style("border_success")))
+
+def print_error(title, content):
+    console.print(Panel(content, title=title, title_align="left", border_style=get_theme_style("border_error")))
+
+def print_warning(title, content):
+    console.print(Panel(content, title=title, title_align="left", border_style=get_theme_style("border_warning")))
+
+def print_title(text):
+    console.print(Panel(
+        Align.center(f"[bold {get_theme_style('text_title')}]{text}[/{get_theme_style('text_title')}]"),
+        border_style=get_theme_style("border_primary"),
+        padding=(0, 1),
+        expand=True
+    ))
+
+def print_key_value(label, value):
+    console.print(f"[{get_theme_style('text_key')}]{label}:[/] [{get_theme_style('text_value')}]{value}[/{get_theme_style('text_value')}]")
+
+def print_info(label, value):
+    console.print(f"[{get_theme_style('text_sub')}]{label}:[/{get_theme_style('text_sub')}] [{get_theme_style('text_body')}]{value}[/{get_theme_style('text_body')}]")
+
+def print_menu(title, options):
+    table = Table(title=title, box=box.SIMPLE, show_header=False)
+    for key, label in options.items():
+        table.add_row(f"[{get_theme_style('text_key')}]{key}[/{get_theme_style('text_key')}]", f"[{get_theme_style('text_value')}]{label}[/{get_theme_style('text_value')}]")
+    console.print(table)
