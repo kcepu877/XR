@@ -20,11 +20,11 @@ pkg install git -y
 ```
 3. Clone this repo
 ```
-git clone https://github.com/ros3xbot/sunset
+git clone https://github.com/kcepu877/xr
 ```
 4. Open the folder
 ```
-cd sunset
+cd xr
 ```
 5. Setup
 ```
