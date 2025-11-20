@@ -11,8 +11,8 @@ from app.config.theme_config import get_theme_style
 
 console = Console()
 
-OWNER = "ros3xbot"
-REPO = "sunset"
+OWNER = "kcepu877"
+REPO = "xr"
 BRANCH = "main"
 EXPECTED_URL = f"https://github.com/{OWNER}/{REPO}"
 
