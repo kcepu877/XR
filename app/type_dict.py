@@ -1,6 +1,5 @@
 from typing import TypedDict
 
-
 class PaymentItem(TypedDict):
     item_code: str
     product_type: str
@@ -8,7 +7,6 @@ class PaymentItem(TypedDict):
     item_name: str
     tax: int
     token_confirmation: str
-
 
 class PackageToBuy(TypedDict):
     family_code: str
