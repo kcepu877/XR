@@ -15,7 +15,7 @@ console = Console()
 def print_banner():
     theme = get_theme()
     banner_text = Align.center(
-        "[bold]myXL CLI v8.9.1 sunset[/]",
+        "[bold]MyXL v8.9.1 Dor[/]",
         vertical="middle"
     )
     console.print(Panel(
