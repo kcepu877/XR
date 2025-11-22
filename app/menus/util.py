@@ -15,7 +15,7 @@ console = Console()
 def print_banner():
     theme = get_theme()
     banner_text = Align.center(
-        "[bold]MyXL v8.9.1 Dor[/]",
+        "[bold]MyXl v8.9.1 Dor[/]",
         vertical="middle"
     )
     console.print(Panel(
@@ -53,14 +53,15 @@ from rich.padding import Padding
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
     ascii_art = r"""
-__________             ___.                  
-\______   \_____ ______\_ |__   ____ ___  ___    ▄   ▄
-|    |  _/\__  \\_  __ \ __ \_/ __ \\  \/  / ▄█▄ █▀█▀█ ▄█▄
-|    |   \ / __ \|  | \/ \_\ \  ___/ >    < ▀▀████▄█▄████▀▀
-|______  /(____  /__|  |___  /\___  >__/\_ \     ▀█▀█▀
-       \/      \/          \/     \/      \/"""
+ ___      ___  ___  ___  ___  ___  ___       
+|"  \    /"  ||"  \/"  ||"  \/"  ||"  |      
+ \   \  //   | \   \  /  \   \  / ||  |      
+ /\\  \/.    |  \\  \/    \\  \/  |:  |      
+|: \.        |  /   /     /\.  \   \  |___   
+|.  \    /:  | /   /     /  \   \ ( \_|:  \  
+|___|\__/|___||___/     |___/\___| \_______) """
 
-    version_text = f"[{get_theme_style('text_body')}]MyXL v8.9.1 Dor[/{get_theme_style('text_body')}]"
+    version_text = f"[{get_theme_style('text_body')}]MyXl v8.9.1 Dor[/{get_theme_style('text_body')}]"
     
     content = f"{ascii_art}\n                  {version_text}"
     console.print(
@@ -86,14 +87,15 @@ __________             ___.
 def clear_sc():
     os.system('cls' if os.name == 'nt' else 'clear')
     ascii_art = r"""
-__________             ___.                  
-\______   \_____ ______\_ |__   ____ ___  ___    ▄   ▄
-|    |  _/\__  \\_  __ \ __ \_/ __ \\  \/  / ▄█▄ █▀█▀█ ▄█▄
-|    |   \ / __ \|  | \/ \_\ \  ___/ >    < ▀▀████▄█▄████▀▀
-|______  /(____  /__|  |___  /\___  >__/\_ \     ▀█▀█▀
-       \/      \/          \/     \/      \/"""
+ ___      ___  ___  ___  ___  ___  ___       
+|"  \    /"  ||"  \/"  ||"  \/"  ||"  |      
+ \   \  //   | \   \  /  \   \  / ||  |      
+ /\\  \/.    |  \\  \/    \\  \/  |:  |      
+|: \.        |  /   /     /\.  \   \  |___   
+|.  \    /:  | /   /     /  \   \ ( \_|:  \  
+|___|\__/|___||___/     |___/\___| \_______) """
 
-    version_text = f"[{get_theme_style('text_body')}]MyXL v8.9.1 Dor[/{get_theme_style('text_body')}]"
+    version_text = f"[{get_theme_style('text_body')}]MyXl v8.9.1 Dor[/{get_theme_style('text_body')}]"
     
     content = f"{ascii_art}\n                  {version_text}"
     console.print(
