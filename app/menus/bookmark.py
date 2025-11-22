@@ -13,6 +13,7 @@ from app.config.theme_config import get_theme
 
 console = Console()
 
+
 def show_bookmark_menu(return_package_detail: bool = False):
     api_key = AuthInstance.api_key
     tokens = AuthInstance.get_active_tokens()
@@ -51,7 +52,7 @@ def show_bookmark_menu(return_package_detail: bool = False):
 
         console.print(Panel(nav, border_style=theme["border_info"], expand=True))
 
-        choice = console.input(f"[{theme['text_sub']}]Pilih bookmark (nomor):[/{theme['text_sub']}] ").strip()
+        choice = console.input(f"[{theme['text_title']}]Pilih bookmark (nomor):[/{theme['text_title']}] ").strip()
 
         if choice == "00":
             return (None, None) if return_package_detail else None

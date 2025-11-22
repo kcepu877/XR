@@ -12,6 +12,7 @@ from app.service.service import load_status, save_status
 
 console = Console()
 
+
 def normalize_number(raw_input: str) -> str:
     raw_input = raw_input.strip()
     if raw_input.startswith("08"):
@@ -22,6 +23,7 @@ def normalize_number(raw_input: str) -> str:
         return raw_input
     return raw_input
 
+
 def login_prompt(api_key: str):
     clear_sc()
     theme = get_theme()
@@ -31,8 +33,8 @@ def login_prompt(api_key: str):
         padding=(1, 2),
         expand=True
     ))
-    console.print(f" Masukkan nomor XL, Support (08xx / 628xx / +628xx) ")
-    raw_input = console.input(" Nomor: ").strip()
+    console.print(f" Masukkan nomor XL, Supported (08xx / 628xx / +628xx) ")
+    raw_input = console.input(f"[{theme['text_title']}] Nomor: [/{theme['text_title']}] ").strip()
     phone_number = normalize_number(raw_input)
 
     if not phone_number.startswith("628") or len(phone_number) < 10 or len(phone_number) > 14:
@@ -70,6 +72,7 @@ def login_prompt(api_key: str):
     except Exception as e:
         print_panel("⚠️ Error", f"Terjadi kesalahan: {e}")
         return None, None
+
 
 def show_account_menu():
     clear_sc()
@@ -154,8 +157,8 @@ def show_account_menu():
         
         console.print(Panel(nav_table, border_style=theme["border_info"], padding=(0, 1), expand=True))
         console.print(f"Masukkan nomor akun (1 - {len(users)}) untuk berganti.")
-        
-        input_str = console.input("Pilihan: ").strip()
+
+        input_str = choice = console.input(f"[{theme['text_title']}]Pilihan:[/{theme['text_title']}] ").strip()
         
         if input_str == "00":
             return active_user["number"] if active_user else None

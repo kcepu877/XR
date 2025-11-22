@@ -560,7 +560,7 @@ def get_packages_by_family(
             expand=True
         ))
 
-        choice = console.input(f"[{theme['text_sub']}]Pilih paket (nomor):[/{theme['text_sub']}] ").strip()
+        choice = console.input(f"[{theme['text_title']}]Pilih paket (nomor):[/{theme['text_title']}] ").strip()
         if choice == "00":
             return "BACK"
         if not choice.isdigit():
@@ -686,7 +686,8 @@ def fetch_my_packages():
 
                     benefit_table.add_row(name, dt, f"{r_str} / {t_str}")
 
-            with console.status(f"🔍 Memuat detail paket #{num}..."):
+            #with console.status(f"🔍 Memuat detail paket #{num}..."):
+            with console.status(f"{num}"):
                 package_details = get_package(api_key, tokens, quota_code)
             if package_details:
                 family_code = package_details["package_family"]["package_family_code"]
@@ -735,7 +736,7 @@ def fetch_my_packages():
             expand=True
         ))
 
-        choice = console.input(f"[{theme['text_sub']}]Pilihan:[/{theme['text_sub']}] ").strip()
+        choice = console.input(f"[{theme['text_title']}]Pilihan:[/{theme['text_title']}] ").strip()
         if choice == "00":
             return "BACK"
 
