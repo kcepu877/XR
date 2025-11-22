@@ -7,7 +7,7 @@ import sys
 from rich.panel import Panel
 from rich.text import Text
 from rich.console import Console
-from app.service.git import ensure_git
+from app.service.git import check_for_updates, ensure_git
 from app.menus.util import pause, live_loading, print_panel, print_error
 from app.config.theme_config import get_theme, get_theme_style
 
@@ -153,6 +153,16 @@ def run_main():
         sys.exit(1)
 
 if __name__ == "__main__":
+    try:
+        with live_loading("🔄 Checking for updates...", get_theme()):
+            need_update = check_for_updates()
+    except Exception as e:
+        print_warning("⚠️", f"Gagal cek update: {e}")
+        need_update = False
+
     ensure_git()
-    git_pull_rebase()
+
+    if need_update:
+        git_pull_rebase()
+
     run_main()

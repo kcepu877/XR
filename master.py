@@ -13,6 +13,7 @@ from app.service.git import check_for_updates, ensure_git
 from app.menus.util import (
     clear_screen,
     clear_sc,
+    simple_number,
     pause,
     print_panel,
     print_error,
@@ -25,7 +26,7 @@ from app.client.engsel import (
     get_balance,
     get_tiering_info,
     get_quota,
-    dashboard_segments,
+    dash_segments,
 )
 from app.client.famplan import validate_msisdn
 from app.client.registration import dukcapil
@@ -49,22 +50,22 @@ from app.menus.store.search import show_family_list_menu, show_store_packages_me
 from app.menus.store.redemables import show_redeemables_menu
 from app.menus.info import show_info_menu
 from app.menus.family_grup import show_family_grup_menu
+from app.menus.sfy import show_special_for_you_menu
+from app.menus.bundle import show_bundle_menu
 from app.menus.theme import show_theme_menu
 from app.config.theme_config import get_theme, get_theme_style
 
 console = Console()
 
 
-def show_main_menu(profile, display_quota, segments):
+def show_main_menu(profile: dict, display_quota: str, segments: dict):
     clear_sc()
     theme = get_theme()
 
-    expired_at_dt = datetime.fromtimestamp(profile["balance_expired_at"]).strftime(
-        "%Y-%m-%d %H:%M:%S"
-    )
-    pulsa_str = get_rupiah(profile["balance"])
+    expired_at_ts = profile.get("balance_expired_at")
+    expired_at_dt = datetime.fromtimestamp(expired_at_ts).strftime("%Y-%m-%d %H:%M:%S") if expired_at_ts else "-"
+    pulsa_str = get_rupiah(profile.get("balance", 0))
 
-    # Panel informasi akun ✨
     info_table = Table.grid(padding=(0, 1))
     info_table.add_column(justify="left", style=get_theme_style("text_body"))
     info_table.add_column(justify="left", style=get_theme_style("text_body"))
@@ -87,7 +88,6 @@ def show_main_menu(profile, display_quota, segments):
         )
     )
 
-    # Paket spesial preview 🔥
     special_packages = segments.get("special_packages", [])
     if special_packages:
         best = random.choice(special_packages)
@@ -114,9 +114,8 @@ def show_main_menu(profile, display_quota, segments):
                 width=console.size.width,
             )
         )
-        console.print(Align.center(f"[{theme['text_sub']}]Pilih [11] untuk lihat semua paket spesial[/{theme['text_sub']}]"))
+        console.print(Align.center(f"[{theme['text_sub']}]Pilih [Y] untuk lihat semua paket spesial[/{theme['text_sub']}]"))
 
-    # Menu utama ⭐
     menu_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
     menu_table.add_column("Kode", justify="right", style=get_theme_style("text_key"), width=6)
     menu_table.add_column("Aksi", style=get_theme_style("text_body"))
@@ -125,23 +124,18 @@ def show_main_menu(profile, display_quota, segments):
     menu_table.add_row("2", "📑 Lihat Paket Saya")
     menu_table.add_row("3", "🔥 Beli Paket Hot Promo")
     menu_table.add_row("4", "🔥 Beli Paket Hot Promo-2")
-    menu_table.add_row("5", "🔍 Beli Paket Berdasarkan Option Code")
-    menu_table.add_row("6", "🧩 Beli Paket Berdasarkan Family Code")
-    menu_table.add_row("7", "🛒 Beli Semua Paket di Family Code")
+    menu_table.add_row("5", "💴 Beli Paket Berdasarkan Option Code")
+    menu_table.add_row("6", "💵 Beli Paket Berdasarkan Family Code")
+    menu_table.add_row("7", "🔁 Beli Semua Paket di Family Code")
     menu_table.add_row("8", "📜 Riwayat Transaksi")
-    menu_table.add_row("9", "👨‍👩‍👧‍👦 Family Plan/Akrab Organizer")
-    menu_table.add_row("10", "👥 Circle")
-    menu_table.add_row("12", "📂 Store Family List")
-    menu_table.add_row("13", "📦 Store Packages")
-    menu_table.add_row("14", "🎁 Redeemables")
-    menu_table.add_row("R", "📝 Register")
-    menu_table.add_row("N", "🔔 Notifikasi")
-    menu_table.add_row("V", "✅ Validate MSISDN")
-    menu_table.add_row("00", "⭐ Bookmark Paket")
-    menu_table.add_row("66", "💾 Simpan/Kelola Family Code")
-    menu_table.add_row("77", "📢 Info Unlock Code")
-    menu_table.add_row("88", "🎨 Ganti Tema CLI")
-    menu_table.add_row("99", "⛔ Tutup aplikasi")
+    menu_table.add_row("00", "📌 Bookmark Paket")
+    menu_table.add_row("", "")
+    menu_table.add_row("44", "🎭 Ciptakan Paket Decoy (multi)")
+    menu_table.add_row("55", "💾 Simpan/Kelola Family Code")
+    menu_table.add_row("66", "📢 Info Unlock Code")
+    menu_table.add_row("77", "🎨 Ganti Tema CLI")
+    menu_table.add_row("88", f"[{theme['text_sub']}]☕ Menu Berikutnya[/]")
+    menu_table.add_row("99", f"[{theme['text_err']}]⛔ Tutup Aplikasi[/]")
 
     console.print(
         Panel(
@@ -155,29 +149,113 @@ def show_main_menu(profile, display_quota, segments):
     )
 
 
-# ============================
-# Main loop
-# ============================
+def show_main_menu2(active_user: dict, profile: dict):
+    theme = get_theme()
+
+    if not active_user or "tokens" not in active_user:
+        print_error("❌", "User belum aktif, silakan login dulu.")
+        pause()
+        return
+
+    while True:
+        clear_sc()
+
+        console.print(Panel(
+            Align.center("☕ Halaman Menu-2", vertical="middle"),
+            border_style=theme["border_info"],
+            padding=(1, 2),
+            expand=True
+        ))
+        simple_number()
+
+        menu_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
+        menu_table.add_column("Kode", justify="right", style=get_theme_style("text_key"), width=6)
+        menu_table.add_column("Aksi", style=get_theme_style("text_body"))
+
+        menu_table.add_row("9", "👨‍👩‍👧‍👦 Family Plan/Akrab Organizer")
+        menu_table.add_row("10", "👥 Circle")
+        menu_table.add_row("11", "🏬 Store Segments")
+        menu_table.add_row("12", "📂 Store Family List")
+        menu_table.add_row("13", "📦 Store Packages")
+        menu_table.add_row("14", "🎁 Redeemables")
+        menu_table.add_row("", "")
+        menu_table.add_row("N", "🔔 Notifikasi")
+        menu_table.add_row("R", "📝 Register")
+        menu_table.add_row("V", "✅ Validate MSISDN")
+        menu_table.add_row("", "")
+        menu_table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu utama[/]")
+
+        console.print(Panel(
+            menu_table,
+            title=f"[{get_theme_style('text_title')}]🧾 Menu[/]",
+            border_style=theme["border_primary"],
+            padding=(0, 1),
+            expand=True
+        ))
+
+        choice = console.input(f"[{theme['text_title']}]Pilih menu:[/{theme['text_title']}] ").strip()
+        if choice == "9":
+            show_family_info(AuthInstance.api_key, active_user["tokens"])
+        elif choice == "10":
+            show_circle_info(AuthInstance.api_key, active_user["tokens"])
+        elif choice == "11":
+            is_enterprise = input("🏬 Enterprise store? (y/n): ").lower() == "y"
+            show_store_segments_menu(is_enterprise)
+        elif choice == "12":
+            is_enterprise = input("📂 Enterprise? (y/n): ").lower() == "y"
+            show_family_list_menu(profile["subscription_type"], is_enterprise)
+        elif choice == "13":
+            is_enterprise = input("📦 Enterprise? (y/n): ").lower() == "y"
+            show_store_packages_menu(profile["subscription_type"], is_enterprise)
+        elif choice == "14":
+            is_enterprise = input("🎁 Enterprise? (y/n): ").lower() == "y"
+            show_redeemables_menu(is_enterprise)
+
+        elif choice.lower() == "n":
+            show_notification_menu()
+        elif choice.lower() == "r":
+            msisdn = input("📝 Masukkan msisdn (628xxxx): ")
+            nik = input("Masukkan NIK: ")
+            kk = input("Masukkan KK: ")
+            res = dukcapil(AuthInstance.api_key, msisdn, kk, nik)
+            print_panel("📑 Hasil Registrasi", json.dumps(res, indent=2))
+            pause()
+        elif choice.lower() == "v":
+            msisdn = input("✅ Masukkan msisdn untuk validasi (628xxxx): ")
+            res = validate_msisdn(AuthInstance.api_key, active_user["tokens"], msisdn)
+            print_panel("📑 Hasil Validasi", json.dumps(res, indent=2))
+            pause()
+        elif choice == "00":
+            live_loading(text="Kembali ke menu utama...", theme=theme)
+            return
+        else:
+            print_warning("⚠️", "Pilihan tidak valid. Silakan coba lagi.")
+            pause()
+
+
 def main():
     ensure_git()
+    theme = get_theme()
     while True:
         active_user = AuthInstance.get_active_user()
         if active_user is not None:
             with live_loading("🔄 Memuat data akun...", get_theme()):
                 balance = get_balance(AuthInstance.api_key, active_user["tokens"]["id_token"])
                 quota = get_quota(AuthInstance.api_key, active_user["tokens"]["id_token"]) or {}
-                segments = dashboard_segments(AuthInstance.api_key, active_user["tokens"]["id_token"], active_user["tokens"]["access_token"]) or {}
+                segments = dash_segments(
+                    AuthInstance.api_key,
+                    active_user["tokens"]["id_token"],
+                    active_user["tokens"]["access_token"]
+                ) or {}
 
-            # Format quota
             remaining = quota.get("remaining", 0)
             total = quota.get("total", 0)
             has_unlimited = quota.get("has_unlimited", False)
             if total > 0 or has_unlimited:
-                display_quota = f"{remaining/1e9:.2f}/{total/1e9:.2f} GB" + (" (Unlimited)" if has_unlimited else "")
+                display_quota = f"{remaining/1e9:.2f} / {total/1e9:.2f} GB" + (" (Unlimited)" if has_unlimited else "")
             else:
                 display_quota = "-"
 
-            # Tiering
             point_info = "Points: N/A | Tier: N/A"
             if active_user["subscription_type"] == "PREPAID":
                 tiering_data = get_tiering_info(AuthInstance.api_key, active_user["tokens"])
@@ -192,21 +270,19 @@ def main():
                 "point_info": point_info,
             }
 
-            # tampilkan menu utama
             show_main_menu(profile, display_quota, segments)
 
-            choice = input("👉 Pilih menu: ")
+            choice = console.input(f"[{theme['text_title']}]👉 Pilih menu:[/{theme['text_title']}] ").strip()
 
-            # Shortcuts & navigasi
             if choice.lower() == "t":
                 pause()
             elif choice == "1":
                 selected_user_number = show_account_menu()
                 if selected_user_number:
                     AuthInstance.set_active_user(selected_user_number)
-                    print_success("🔐 Akun", f"Akun aktif diganti ke {selected_user_number}")
+                    print_success("🔐", f"Akun aktif diganti ke {selected_user_number}")
                 else:
-                    print_error("❌ Akun", "Tidak ada user terpilih atau gagal memuat user.")
+                    print_error("❌", "Tidak ada user terpilih atau gagal memuat user.")
                 continue
             elif choice == "2":
                 fetch_my_packages()
@@ -216,17 +292,17 @@ def main():
             elif choice == "4":
                 show_hot_menu2()
             elif choice == "5":
-                option_code = input("🔍 Masukkan option code (atau '99' untuk batal): ")
+                option_code = input("🔍 Masukkan option code: ")
                 if option_code == "99":
                     continue
                 show_package_details(AuthInstance.api_key, active_user["tokens"], option_code, False)
             elif choice == "6":
-                family_code = input("🧩 Masukkan family code (atau '99' untuk batal): ")
+                family_code = input("🧩 Masukkan family code: ")
                 if family_code == "99":
                     continue
                 get_packages_by_family(family_code)
             elif choice == "7":
-                family_code = input("🛒 Masukkan family code (atau '99' untuk batal): ")
+                family_code = input("🛒 Masukkan family code: ")
                 if family_code == "99":
                     continue
                 start_from_option = input("Mulai dari option number (default 1): ")
@@ -244,68 +320,47 @@ def main():
                 purchase_by_family(family_code, use_decoy, pause_on_success, delay_seconds, start_from_option)
             elif choice == "8":
                 show_transaction_history(AuthInstance.api_key, active_user["tokens"])
-            elif choice == "9":
-                show_family_info(AuthInstance.api_key, active_user["tokens"])
-            elif choice == "10":
-                show_circle_info(AuthInstance.api_key, active_user["tokens"])
-            elif choice == "11":
-                is_enterprise = input("🏬 Enterprise store? (y/n): ").lower() == "y"
-                show_store_segments_menu(is_enterprise)
-            elif choice == "12":
-                is_enterprise = input("📂 Enterprise? (y/n): ").lower() == "y"
-                show_family_list_menu(profile["subscription_type"], is_enterprise)
-            elif choice == "13":
-                is_enterprise = input("📦 Enterprise? (y/n): ").lower() == "y"
-                show_store_packages_menu(profile["subscription_type"], is_enterprise)
-            elif choice == "14":
-                is_enterprise = input("🎁 Enterprise? (y/n): ").lower() == "y"
-                show_redeemables_menu(is_enterprise)
             elif choice == "00":
                 show_bookmark_menu()
-            elif choice == "66":
+
+            elif choice == "44":
+                show_bundle_menu()
+            elif choice == "55":
                 show_family_grup_menu()
-            elif choice == "77":
+            elif choice == "66":
                 show_info_menu()
-            elif choice == "88":
+            elif choice == "77":
                 show_theme_menu()
+            elif choice == "88":
+                show_main_menu2(active_user, profile)
             elif choice == "99":
-                print_success("⛔ Exit", "Aplikasi ditutup dengan aman.")
+                print_success("👋 Sampai jumpa!", "Aplikasi ditutup dengan aman.")
                 sys.exit(0)
-            elif choice.lower() == "r":
-                msisdn = input("📝 Masukkan msisdn (628xxxx): ")
-                nik = input("Masukkan NIK: ")
-                kk = input("Masukkan KK: ")
-                res = dukcapil(AuthInstance.api_key, msisdn, kk, nik)
-                print_panel("📑 Hasil Registrasi", json.dumps(res, indent=2))
-                pause()
-            elif choice.lower() == "v":
-                msisdn = input("✅ Masukkan msisdn untuk validasi (628xxxx): ")
-                res = validate_msisdn(AuthInstance.api_key, active_user["tokens"], msisdn)
-                print_panel("📑 Hasil Validasi", json.dumps(res, indent=2))
-                pause()
-            elif choice.lower() == "n":
-                show_notification_menu()
+
+            elif choice.lower() == "y":
+                show_special_for_you_menu(active_user["tokens"])
             elif choice.lower() == "s":
                 enter_sentry_mode()
             else:
-                print_warning("⚠️ Menu", "Pilihan tidak valid. Silakan coba lagi.")
+                print_warning("⚠️", "Pilihan tidak valid. Silakan coba lagi.")
                 pause()
         else:
             selected_user_number = show_account_menu()
             if selected_user_number:
                 AuthInstance.set_active_user(selected_user_number)
-                print_success("🔐 Akun", f"Akun aktif diganti ke {selected_user_number}")
+                print_success("🔐", f"Akun aktif diganti ke {selected_user_number}")
             else:
-                print_error("❌ Akun", "Tidak ada user terpilih atau gagal memuat user.")
+                print_error("❌", "Tidak ada user terpilih atau gagal memuat user.")
 
 
 if __name__ == "__main__":
     try:
         with live_loading("🔄 Checking for updates...", get_theme()):
             need_update = check_for_updates()
-        if need_update:
-            print_warning("⬆️ Update", "Versi baru tersedia, silakan update sebelum melanjutkan.")
-            pause()
+        #if need_update:
+            #print_warning("⬆️", "Versi baru tersedia, silakan update sebelum melanjutkan.")
+            #pause()
+            #sys.exit(0)
         main()
     except KeyboardInterrupt:
-        print_error("⛔ Exit", "Aplikasi dihentikan oleh pengguna.")
+        print_error("👋 Keluar", "Aplikasi dihentikan oleh pengguna.")
