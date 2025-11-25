@@ -2,19 +2,14 @@ from dotenv import load_dotenv
 load_dotenv()
 
 import subprocess
-import os
 import sys
-from rich.panel import Panel
-from rich.text import Text
-from rich.console import Console
-from app.service.git import check_for_updates, ensure_git
-from app.menus.util import pause, live_loading, print_panel, print_error
-from app.config.theme_config import get_theme, get_theme_style
+import os
+from app.config.imports import *
 
-console = Console()
 
 def is_rebase_in_progress():
     return os.path.exists(".git/rebase-apply") or os.path.exists(".git/rebase-merge")
+
 
 def git_pull_rebase():
     theme = get_theme()
@@ -140,6 +135,7 @@ def git_pull_rebase():
         pause()
         sys.exit(1)
 
+
 def run_main():
     try:
         import master
@@ -148,7 +144,7 @@ def run_main():
         print_panel("👋 Keluar", "Aplikasi dihentikan oleh pengguna", border_style=get_theme_style("border_info"))
         sys.exit(0)
     except Exception as e:
-        print_error("❌ Gagal menjalankan menu utama", f"{type(e).__name__} - {e}")
+        print_error("❌ Gagal menjalankan aplikasi", f"{type(e).__name__} - {e}")
         pause()
         sys.exit(1)
 
@@ -164,5 +160,5 @@ if __name__ == "__main__":
 
     if need_update:
         git_pull_rebase()
-
+    #clear_cache()
     run_main()
