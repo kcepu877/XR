@@ -3,63 +3,11 @@ load_dotenv()
 
 import sys, json, random
 from datetime import datetime
-from rich.console import Console
-from rich.table import Table
-from rich.panel import Panel
-from rich.align import Align
-from rich.box import MINIMAL_DOUBLE_HEAD
-
-from app.service.git import check_for_updates, ensure_git
-from app.menus.util import (
-    clear_screen,
-    clear_sc,
-    simple_number,
-    pause,
-    print_panel,
-    print_error,
-    print_warning,
-    print_success,
-    get_rupiah,
-    live_loading,
-)
-from app.client.engsel import (
-    get_balance,
-    get_tiering_info,
-    get_quota,
-    dash_segments,
-)
-from app.client.famplan import validate_msisdn
-from app.client.registration import dukcapil
-from app.service.auth import AuthInstance
-from app.service.sentry import enter_sentry_mode
-from app.menus.payment import show_transaction_history
-from app.menus.bookmark import show_bookmark_menu
-from app.menus.account import show_account_menu
-from app.menus.package import (
-    fetch_my_packages,
-    get_packages_by_family,
-    show_package_details,
-)
-from app.menus.hot import show_hot_menu, show_hot_menu2
-from app.menus.purchase import purchase_by_family
-from app.menus.famplan import show_family_info
-from app.menus.circle import show_circle_info
-from app.menus.notification import show_notification_menu
-from app.menus.store.segments import show_store_segments_menu
-from app.menus.store.search import show_family_list_menu, show_store_packages_menu
-from app.menus.store.redemables import show_redeemables_menu
-from app.menus.info import show_info_menu
-from app.menus.family_grup import show_family_grup_menu
-from app.menus.sfy import show_special_for_you_menu
-from app.menus.bundle import show_bundle_menu
-from app.menus.theme import show_theme_menu
-from app.config.theme_config import get_theme, get_theme_style
-
-console = Console()
+from app.config.imports import *
 
 
 def show_main_menu(profile: dict, display_quota: str, segments: dict):
-    clear_sc()
+    clear_screen()
     theme = get_theme()
 
     expired_at_ts = profile.get("balance_expired_at")
@@ -67,7 +15,7 @@ def show_main_menu(profile: dict, display_quota: str, segments: dict):
     pulsa_str = get_rupiah(profile.get("balance", 0))
 
     info_table = Table.grid(padding=(0, 1))
-    info_table.add_column(justify="left", style=get_theme_style("text_body"))
+    info_table.add_column(justify="left", style=get_theme_style("border_info"))
     info_table.add_column(justify="left", style=get_theme_style("text_body"))
 
     info_table.add_row(" Nomor", f": 📞 [bold {theme['text_body']}]{profile['number']}[/]")
@@ -124,17 +72,19 @@ def show_main_menu(profile: dict, display_quota: str, segments: dict):
     menu_table.add_row("2", "📑 Lihat Paket Saya")
     menu_table.add_row("3", "🔥 Beli Paket Hot Promo")
     menu_table.add_row("4", "🔥 Beli Paket Hot Promo-2")
-    menu_table.add_row("5", "💴 Beli Paket Berdasarkan Option Code")
-    menu_table.add_row("6", "💵 Beli Paket Berdasarkan Family Code")
+    menu_table.add_row("5", "💴 Beli Paket Via Option Code")
+    menu_table.add_row("6", "💵 Beli Paket Via Family Code")
     menu_table.add_row("7", "🔁 Beli Semua Paket di Family Code")
-    menu_table.add_row("8", "📜 Riwayat Transaksi")
-    menu_table.add_row("00", "📌 Bookmark Paket")
+    menu_table.add_row("8", "🔂 Beli berulang dari Family Code")
     menu_table.add_row("", "")
-    menu_table.add_row("44", "🎭 Ciptakan Paket Decoy (multi)")
-    menu_table.add_row("55", "💾 Simpan/Kelola Family Code")
-    menu_table.add_row("66", "📢 Info Unlock Code")
-    menu_table.add_row("77", "🎨 Ganti Tema CLI")
-    menu_table.add_row("88", f"[{theme['text_sub']}]☕ Menu Berikutnya[/]")
+    menu_table.add_row("D", "🎭 Ciptakan Paket bundle (decoy)")
+    menu_table.add_row("F", "💾 Simpan/Kelola Family Code")
+    menu_table.add_row("B", "📌 List Bookmark Paket")
+    menu_table.add_row("C", f"[{theme['text_body']}]🧹 Bersihkan Cache akun[/]")
+    menu_table.add_row("M", f"[{theme['text_body']}]☕ Menu Berikutnya..[/]")
+    menu_table.add_row("", "")
+    menu_table.add_row("66", f"[{theme['border_warning']}]📢 Info Unlock Code[/]")
+    menu_table.add_row("69", f"[{theme['text_sub']}]🎨 Ganti Tema CLI[/]")
     menu_table.add_row("99", f"[{theme['text_err']}]⛔ Tutup Aplikasi[/]")
 
     console.print(
@@ -158,7 +108,7 @@ def show_main_menu2(active_user: dict, profile: dict):
         return
 
     while True:
-        clear_sc()
+        clear_screen()
 
         console.print(Panel(
             Align.center("☕ Halaman Menu-2", vertical="middle"),
@@ -172,17 +122,18 @@ def show_main_menu2(active_user: dict, profile: dict):
         menu_table.add_column("Kode", justify="right", style=get_theme_style("text_key"), width=6)
         menu_table.add_column("Aksi", style=get_theme_style("text_body"))
 
-        menu_table.add_row("9", "👨‍👩‍👧‍👦 Family Plan/Akrab Organizer")
-        menu_table.add_row("10", "👥 Circle")
-        menu_table.add_row("11", "🏬 Store Segments")
-        menu_table.add_row("12", "📂 Store Family List")
-        menu_table.add_row("13", "📦 Store Packages")
-        menu_table.add_row("14", "🎁 Redeemables")
+        menu_table.add_row("10", "📜 Riwayat Transaksi")
+        menu_table.add_row("11", "👨‍👩‍👧‍👦 Akrab Organizer")
+        menu_table.add_row("12", "👥 Circle")
+        menu_table.add_row("13", "🏬 Store Segments")
+        menu_table.add_row("14", "📂 Store Family List")
+        menu_table.add_row("15", "📦 Store Packages")
+        menu_table.add_row("16", "🎁 Redeemables")
         menu_table.add_row("", "")
         menu_table.add_row("N", "🔔 Notifikasi")
         menu_table.add_row("R", "📝 Register")
         menu_table.add_row("V", "✅ Validate MSISDN")
-        menu_table.add_row("", "")
+        #menu_table.add_row("", "")
         menu_table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu utama[/]")
 
         console.print(Panel(
@@ -193,21 +144,23 @@ def show_main_menu2(active_user: dict, profile: dict):
             expand=True
         ))
 
-        choice = console.input(f"[{theme['text_title']}]Pilih menu:[/{theme['text_title']}] ").strip()
-        if choice == "9":
-            show_family_info(AuthInstance.api_key, active_user["tokens"])
-        elif choice == "10":
-            show_circle_info(AuthInstance.api_key, active_user["tokens"])
+        choice = console.input(f"[{theme['text_sub']}]Pilih menu:[/{theme['text_sub']}] ").strip()
+        if choice == "10":
+            show_transaction_history(AuthInstance.api_key, active_user["tokens"])
         elif choice == "11":
+            show_family_info(AuthInstance.api_key, active_user["tokens"])
+        elif choice == "12":
+            show_circle_info(AuthInstance.api_key, active_user["tokens"])
+        elif choice == "13":
             is_enterprise = input("🏬 Enterprise store? (y/n): ").lower() == "y"
             show_store_segments_menu(is_enterprise)
-        elif choice == "12":
+        elif choice == "14":
             is_enterprise = input("📂 Enterprise? (y/n): ").lower() == "y"
             show_family_list_menu(profile["subscription_type"], is_enterprise)
-        elif choice == "13":
+        elif choice == "15":
             is_enterprise = input("📦 Enterprise? (y/n): ").lower() == "y"
             show_store_packages_menu(profile["subscription_type"], is_enterprise)
-        elif choice == "14":
+        elif choice == "16":
             is_enterprise = input("🎁 Enterprise? (y/n): ").lower() == "y"
             show_redeemables_menu(is_enterprise)
 
@@ -235,18 +188,34 @@ def show_main_menu2(active_user: dict, profile: dict):
 
 def main():
     ensure_git()
-    theme = get_theme()
     while True:
+        theme = get_theme()
         active_user = AuthInstance.get_active_user()
         if active_user is not None:
+            account_id = active_user["number"]
+
             with live_loading("🔄 Memuat data akun...", get_theme()):
-                balance = get_balance(AuthInstance.api_key, active_user["tokens"]["id_token"])
-                quota = get_quota(AuthInstance.api_key, active_user["tokens"]["id_token"]) or {}
-                segments = dash_segments(
-                    AuthInstance.api_key,
-                    active_user["tokens"]["id_token"],
-                    active_user["tokens"]["access_token"]
-                ) or {}
+                # Balance cache per akun (TTL 30 detik)
+                balance = get_cache(account_id, "balance", ttl=90)
+                if not balance:
+                    balance = get_balance(AuthInstance.api_key, active_user["tokens"]["id_token"])
+                    set_cache(account_id, "balance", balance)
+
+                # Quota cache per akun (TTL 30 detik)
+                quota = get_cache(account_id, "quota", ttl=60)
+                if not quota:
+                    quota = get_quota(AuthInstance.api_key, active_user["tokens"]["id_token"]) or {}
+                    set_cache(account_id, "quota", quota)
+
+                # Segments cache per akun (TTL 300 detik, file-based)
+                segments = get_cache(account_id, "segments", ttl=300, use_file=True)
+                if not segments:
+                    segments = dash_segments(
+                        AuthInstance.api_key,
+                        active_user["tokens"]["id_token"],
+                        active_user["tokens"]["access_token"]
+                    ) or {}
+                    set_cache(account_id, "segments", segments, use_file=True)
 
             remaining = quota.get("remaining", 0)
             total = quota.get("total", 0)
@@ -258,7 +227,11 @@ def main():
 
             point_info = "Points: N/A | Tier: N/A"
             if active_user["subscription_type"] == "PREPAID":
-                tiering_data = get_tiering_info(AuthInstance.api_key, active_user["tokens"])
+                # Tiering cache per akun (TTL 300 detik)
+                tiering_data = get_cache(account_id, "tiering", ttl=240)
+                if not tiering_data:
+                    tiering_data = get_tiering_info(AuthInstance.api_key, active_user["tokens"])
+                    set_cache(account_id, "tiering", tiering_data)
                 point_info = f"Points: {tiering_data.get('current_point',0)} | Tier: {tiering_data.get('tier',0)}"
 
             profile = {
@@ -272,7 +245,7 @@ def main():
 
             show_main_menu(profile, display_quota, segments)
 
-            choice = console.input(f"[{theme['text_title']}]👉 Pilih menu:[/{theme['text_title']}] ").strip()
+            choice = console.input(f"[{theme['text_sub']}]👉 Pilih menu:[/{theme['text_sub']}] ").strip()
 
             if choice.lower() == "t":
                 pause()
@@ -292,17 +265,17 @@ def main():
             elif choice == "4":
                 show_hot_menu2()
             elif choice == "5":
-                option_code = input("🔍 Masukkan option code: ")
+                option_code = input("🔎 Masukkan option code: ")
                 if option_code == "99":
                     continue
                 show_package_details(AuthInstance.api_key, active_user["tokens"], option_code, False)
             elif choice == "6":
-                family_code = input("🧩 Masukkan family code: ")
+                family_code = input("🔎 Masukkan family code: ")
                 if family_code == "99":
                     continue
                 get_packages_by_family(family_code)
             elif choice == "7":
-                family_code = input("🛒 Masukkan family code: ")
+                family_code = input("🔎 Masukkan family code: ")
                 if family_code == "99":
                     continue
                 start_from_option = input("Mulai dari option number (default 1): ")
@@ -319,22 +292,47 @@ def main():
                     delay_seconds = 0
                 purchase_by_family(family_code, use_decoy, pause_on_success, delay_seconds, start_from_option)
             elif choice == "8":
-                show_transaction_history(AuthInstance.api_key, active_user["tokens"])
-            elif choice == "00":
-                show_bookmark_menu()
-
-            elif choice == "44":
+                family_code = input("Enter family code: ")
+                try:
+                    order = int(input("Enter order number: ") or 1)
+                except ValueError:
+                    order = 1
+                try:
+                    delay = int(input("Enter delay in seconds: ") or 0)
+                except ValueError:
+                    delay = 0
+                pause_on_success = input("Aktifkan mode pause? (y/n): ").lower() == 'y'
+                while True:
+                    should_continue = purchase_loop(
+                        family_code=family_code,
+                        order=order,
+                        use_decoy=True,
+                        delay=delay,
+                        pause_on_success=pause_on_success
+                    )
+                    if not should_continue:
+                        break
+                continue
+ 
+            elif choice.lower() == "d":
                 show_bundle_menu()
-            elif choice == "55":
+            elif choice.lower() == "f":
                 show_family_grup_menu()
+            elif choice.lower() == "b":
+                show_bookmark_menu()
+            elif choice.lower() == "m":
+                show_main_menu2(active_user, profile)
+            elif choice.lower() == "c":
+                clear_cache(account_id)
+                print_success("🧹", f"Cache untuk akun {account_id} berhasil dibersihkan.")
+                pause()
+
             elif choice == "66":
                 show_info_menu()
-            elif choice == "77":
+            elif choice == "69":
                 show_theme_menu()
-            elif choice == "88":
-                show_main_menu2(active_user, profile)
             elif choice == "99":
-                print_success("👋 Sampai jumpa!", "Aplikasi ditutup dengan aman.")
+                print_panel("👋 Sampai jumpa!", "Aplikasi ditutup dengan aman.")
                 sys.exit(0)
 
             elif choice.lower() == "y":
@@ -357,10 +355,11 @@ if __name__ == "__main__":
     try:
         with live_loading("🔄 Checking for updates...", get_theme()):
             need_update = check_for_updates()
-        #if need_update:
-            #print_warning("⬆️", "Versi baru tersedia, silakan update sebelum melanjutkan.")
-            #pause()
-            #sys.exit(0)
+        # Jika ingin paksa update, aktifkan blok ini:
+        # if need_update:
+        #     print_warning("⬆️", "Versi baru tersedia, silakan update sebelum melanjutkan.")
+        #     pause()
+        #     sys.exit(0)
         main()
     except KeyboardInterrupt:
         print_error("👋 Keluar", "Aplikasi dihentikan oleh pengguna.")
