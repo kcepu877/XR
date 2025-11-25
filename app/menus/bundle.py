@@ -1,19 +1,11 @@
-from app.service.auth import AuthInstance
+from app.config.imports import *
 from app.client.purchase.balance import settlement_balance
 from app.client.purchase.qris import show_qris_payment
 from app.client.purchase.ewallet import show_multipayment
-from app.menus.util import clear_screen, pause, print_panel, get_rupiah
-from app.config.theme_config import get_theme
+from app.menus.util import clear_screen, pause, print_panel, get_rupiah, simple_number
 from app.menus.package import get_packages_by_family
 from app.menus.family_grup import show_family_grup_menu
 from app.menus.bookmark import show_bookmark_menu
-from app.type_dict import PaymentItem
-from rich.console import Console
-from rich.panel import Panel
-from rich.table import Table
-from rich.align import Align
-from rich.text import Text
-from rich.box import MINIMAL_DOUBLE_HEAD
 
 console = Console()
 
@@ -29,12 +21,14 @@ def show_bundle_menu():
 
     while True:
         clear_screen()
+        ensure_git()
         console.print(Panel(
-            Align.center("🛒 Keranjang Paket Bundle", vertical="middle"),
+            Align.center("🛒 Keranjang Paket", vertical="middle"),
             border_style=theme["border_info"],
             padding=(1, 2),
             expand=True
         ))
+        simple_number()
 
         if cart_items:
             table = Table(box=MINIMAL_DOUBLE_HEAD, expand=True)
@@ -45,7 +39,7 @@ def show_bundle_menu():
             for i, item in enumerate(display_cart, start=1):
                 table.add_row(str(i), item["name"], get_rupiah(item["price"]))
 
-            console.print(Panel(table, border_style=theme["border_primary"], padding=(0, 1), expand=True))
+            console.print(Panel(table, border_style=theme["border_info"], padding=(0, 1), expand=True))
             console.print(f"[{theme['text_body']}]Total Harga: Rp {get_rupiah(total_price)}[/]")
         else:
             print_panel("ℹ️", "Keranjang masih kosong.")
@@ -56,12 +50,12 @@ def show_bundle_menu():
         nav.add_row("1", "Tambah dari Bookmark")
         nav.add_row("2", "Tambah dari Family Code Tersimpan")
         nav.add_row("3", "Tambah dari Family Code Manual")
-        nav.add_row("4", f"[{theme['text_err']}]Hapus Item dari Keranjang[/]")
         if cart_items:
+            nav.add_row("4", f"[{theme['text_err']}]Hapus Item dari Keranjang[/]")
             nav.add_row("5", f"[{theme['text_warn']}]💳 Lanjutkan ke Pembayaran[/]")
         nav.add_row("00", f"[{theme['text_sub']}]Kembali ke menu utama[/]")
 
-        console.print(Panel(nav, border_style=theme["border_info"], padding=(0, 1), expand=True))
+        console.print(Panel(nav, border_style=theme["border_primary"], padding=(0, 0), expand=True))
 
         choice = console.input(f"[{theme['text_sub']}]Pilihan:[/{theme['text_sub']}] ").strip()
 
@@ -133,6 +127,7 @@ def show_bundle_menu():
                 padding=(1, 2),
                 expand=True
             ))
+            simple_number()
 
             while True:
                 method_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)

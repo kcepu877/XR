@@ -1,11 +1,5 @@
-from rich.console import Console
-from rich.table import Table
-from rich.panel import Panel
-from rich.align import Align
-from rich.box import MINIMAL_DOUBLE_HEAD
-
-from app.config.theme_config import get_theme, get_all_presets, set_theme
-from app.menus.util import clear_screen, pause, print_panel
+from app.config.imports import *
+from app.menus.util import clear_screen, pause, print_panel, simple_number
 
 console = Console()
 
@@ -13,11 +7,11 @@ console = Console()
 def show_theme_menu():
     while True:
         clear_screen()
+        ensure_git()
         theme = get_theme()
         presets = get_all_presets()
         theme_names = list(presets.keys())
 
-        # Header panel
         console.print(Panel(
             Align.center("🎨 Pilih Tema CLI", vertical="middle"),
             style=theme["text_title"],
@@ -25,8 +19,8 @@ def show_theme_menu():
             padding=(1, 2),
             expand=True,
         ))
+        simple_number()
 
-        # Tabel daftar tema
         table = Table(box=MINIMAL_DOUBLE_HEAD, expand=True)
         table.add_column("No", justify="right", style=theme["text_number"], width=6)
         table.add_column("Nama Tema", style=theme["text_body"])
@@ -43,17 +37,15 @@ def show_theme_menu():
             )
             table.add_row(str(idx), name.replace("_", " ").title(), preview)
 
-        console.print(Panel(table, border_style=theme["border_primary"], padding=(0, 0), expand=True))
+        console.print(Panel(table, border_style=theme["border_info"], padding=(0, 0), expand=True))
 
-        # Navigasi
         nav_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
         nav_table.add_column(justify="right", style=theme["text_key"], width=4)
         nav_table.add_column(style=theme["text_body"])
         nav_table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu utama[/]")
 
-        console.print(Panel(nav_table, border_style=theme["border_info"], padding=(0, 1), expand=True))
+        console.print(Panel(nav_table, border_style=theme["border_primary"], padding=(0, 1), expand=True))
 
-        # Input pilihan
         choice = console.input(f"[{theme['text_title']}]Pilih nomor tema:[/{theme['text_title']}] ").strip()
 
         if choice == "00":
@@ -63,7 +55,6 @@ def show_theme_menu():
             selected_theme = theme_names[int(choice) - 1]
             selected_preset = presets[selected_theme]
 
-            # Preview tema sebelum konfirmasi
             preview_panel = Panel(
                 Align.center(f"Preview Tema: {selected_theme.replace('_', ' ').title()}"),
                 border_style=selected_preset["border_primary"],

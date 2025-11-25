@@ -1,15 +1,6 @@
-from rich.console import Console
-from rich.panel import Panel
-from rich.table import Table
-from rich.align import Align
-from rich.box import MINIMAL_DOUBLE_HEAD
-
-from app.service.auth import AuthInstance
-from app.menus.util import clear_screen, pause, print_panel
-from app.service.bookmark import BookmarkInstance
-from app.client.engsel import get_family
+from app.config.imports import *
+from app.menus.util import clear_screen, simple_number, pause, print_panel
 from app.menus.package import show_package_details, get_package_details
-from app.config.theme_config import get_theme
 
 console = Console()
 
@@ -21,16 +12,18 @@ def show_bookmark_menu(return_package_detail: bool = False):
 
     while True:
         clear_screen()
+        ensure_git()
         console.print(Panel(
             Align.center("📌 Daftar Bookmark Paket", vertical="middle"),
             border_style=theme["border_info"],
             padding=(1, 2),
             expand=True
         ))
+        simple_number()
 
         bookmarks = BookmarkInstance.get_bookmarks()
         if not bookmarks:
-            print_panel("ℹ️ Info", "Tidak ada bookmark tersimpan.")
+            print_panel("ℹ️", "Tidak ada bookmark tersimpan.")
             pause()
             return (None, None) if return_package_detail else None
 
@@ -42,7 +35,7 @@ def show_bookmark_menu(return_package_detail: bool = False):
             label = f"{bm['family_name']} - {bm['variant_name']} - {bm['option_name']}"
             table.add_row(str(idx + 1), label)
 
-        console.print(Panel(table, border_style=theme["border_primary"], expand=True))
+        console.print(Panel(table, border_style=theme["border_info"], padding=(0, 0), expand=True))
 
         nav = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
         nav.add_column(justify="right", style=theme["text_key"], width=6)
@@ -50,7 +43,7 @@ def show_bookmark_menu(return_package_detail: bool = False):
         nav.add_row("00", f"[{theme['text_sub']}]⬅️ Kembali ke menu awal[/]")
         nav.add_row("000", f"[{theme['text_err']}]🗑️ Hapus Bookmark[/]")
 
-        console.print(Panel(nav, border_style=theme["border_info"], expand=True))
+        console.print(Panel(nav, border_style=theme["border_primary"], expand=True))
 
         choice = console.input(f"[{theme['text_title']}]Pilih bookmark (nomor):[/{theme['text_title']}] ").strip()
 

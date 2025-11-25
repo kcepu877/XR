@@ -1,14 +1,7 @@
 import os
-from rich.console import Console
-from rich.table import Table
-from rich.panel import Panel
-from rich.box import MINIMAL_DOUBLE_HEAD
-from rich.align import Align
 
-from app.client.engsel import dash_segments
+from app.config.imports import *
 from app.menus.util import clear_screen, pause, print_panel, print_error
-from app.config.theme_config import get_theme
-from app.service.auth import AuthInstance
 from app.menus.package import show_package_details
 from app.menus.util import get_rupiah
 
@@ -71,6 +64,7 @@ def show_special_for_you_menu(tokens: dict):
 
     while True:
         clear_screen()
+        ensure_git()
 
         if not special_packages:
             print_panel("ℹ️ Info", "Tidak ada paket spesial tersedia saat ini.")
@@ -109,7 +103,7 @@ def show_special_for_you_menu(tokens: dict):
                 f"[{theme['text_money']}]{diskon_price}[/{theme['text_money']}]"
             )
 
-        console.print(Panel(table, border_style=theme["border_primary"], padding=(0, 0), expand=True))
+        console.print(Panel(table, border_style=theme["border_info"], padding=(0, 0), expand=True))
 
         nav_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
         nav_table.add_column(justify="right", style=theme["text_key"], width=6)
@@ -118,7 +112,7 @@ def show_special_for_you_menu(tokens: dict):
 
         console.print(Panel(
             nav_table,
-            border_style=theme["border_info"],
+            border_style=theme["border_primary"],
             padding=(0, 1),
             expand=True
         ))

@@ -1,14 +1,7 @@
-from rich.console import Console
-from rich.panel import Panel
-from rich.table import Table
-from rich.align import Align
-from rich.box import MINIMAL_DOUBLE_HEAD
-
+from app.config.imports import *
 from app.client.ciam import get_otp, submit_otp
-from app.menus.util import clear_screen, clear_sc, pause, print_panel, nav_range
-from app.service.auth import AuthInstance
-from app.config.theme_config import get_theme
 from app.service.service import load_status, save_status
+from app.menus.util import clear_screen, simple_number, pause, print_panel, nav_range
 
 console = Console()
 
@@ -25,16 +18,16 @@ def normalize_number(raw_input: str) -> str:
 
 
 def login_prompt(api_key: str):
-    clear_sc()
+    clear_screen()
     theme = get_theme()
     console.print(Panel(
-        Align.center("🔐 Login ke MyXL", vertical="middle"),
+        Align.center("🔐 Login ke myXL CLI", vertical="middle"),
         border_style=theme["border_info"],
         padding=(1, 2),
         expand=True
     ))
     console.print(f" Masukkan nomor XL, Supported (08xx / 628xx / +628xx) ")
-    raw_input = console.input(f"[{theme['text_title']}] Nomor: [/{theme['text_title']}] ").strip()
+    raw_input = console.input(f"[{theme['text_sub']}] Nomor: [/{theme['text_sub']}] ").strip()
     phone_number = normalize_number(raw_input)
 
     if not phone_number.startswith("628") or len(phone_number) < 10 or len(phone_number) > 14:
@@ -75,7 +68,8 @@ def login_prompt(api_key: str):
 
 
 def show_account_menu():
-    clear_sc()
+    clear_screen()
+    ensure_git()
     theme = get_theme()
     AuthInstance.load_tokens()
     users = AuthInstance.refresh_tokens
@@ -126,6 +120,7 @@ def show_account_menu():
             padding=(1, 2),
             expand=True
         ))
+        simple_number()
 
         account_table = Table(box=MINIMAL_DOUBLE_HEAD, expand=True)
         account_table.add_column("No", style=theme["text_key"], justify="right", width=3)
@@ -145,7 +140,7 @@ def show_account_menu():
                 status
             )
 
-        console.print(Panel(account_table, border_style=theme["border_primary"], padding=(0, 1), expand=True))
+        console.print(Panel(account_table, border_style=theme["border_info"], padding=(0, 0), expand=True))
 
         nav_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
         nav_table.add_column(justify="right", style=theme["text_key"], width=6)
@@ -155,10 +150,10 @@ def show_account_menu():
         nav_table.add_row("H", f"[{theme['text_err']}]Hapus akun tersimpan[/]")
         nav_table.add_row("00", f"[{theme['text_sub']}]Kembali ke menu utama[/]")
         
-        console.print(Panel(nav_table, border_style=theme["border_info"], padding=(0, 1), expand=True))
+        console.print(Panel(nav_table, border_style=theme["border_primary"], padding=(0, 1), expand=True))
         console.print(f"Masukkan nomor akun (1 - {len(users)}) untuk berganti.")
 
-        input_str = choice = console.input(f"[{theme['text_title']}]Pilihan:[/{theme['text_title']}] ").strip()
+        input_str = choice = console.input(f"[{theme['text_sub']}]Pilihan:[/{theme['text_sub']}] ").strip()
         
         if input_str == "00":
             return active_user["number"] if active_user else None
