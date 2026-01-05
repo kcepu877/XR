@@ -7,8 +7,8 @@ import xml.etree.ElementTree as ET
 from rich.console import Console
 from rich.panel import Panel
 from rich.text import Text
-from app.config.theme_config import get_theme_style
-from app.menus.util import print_error, print_success, print_warning, print_panel
+from app2.config.theme_config import get_theme_style
+from app2.menus.util import print_error, print_success, print_warning, print_panel
 
 console = Console()
 
@@ -30,8 +30,8 @@ def ensure_git(strict=True):
     git_config = os.path.join(root_path, ".git", "config")
 
     if not os.path.exists(git_config):
-        print_error("❌", "Script ini hanya bisa dijalankan dari hasil git clone.")
-        print_panel("📑 Info", f"Pastikan Anda meng-clone dari repository resmi:\n  git clone {EXPECTED_URL}")
+        print_error("Kesalahan", "Script ini hanya dapat dijalankan jika hasil git clone.")
+        print_panel("Informasi", f"Clone dari repo resmi:\n  git clone {EXPECTED_URL}")
         if strict:
             sys.exit(1)
         return False
@@ -41,13 +41,13 @@ def ensure_git(strict=True):
 
     origin_url = config.get('remote "origin"', 'url', fallback="").strip()
     if origin_url != EXPECTED_URL:
-        print_warning("⚠️", "Repo ini tidak berasal dari sumber resmi.")
-        print_panel("📑 Info", f"URL saat ini: {origin_url}\nSilakan clone ulang dari:\n  git clone {EXPECTED_URL}")
+        print_warning("Kesalahan", "Repo ini bukan dari sumber resmi.")
+        print_panel("Informasi", f"URL saat ini: {origin_url}\nClone ulang dari:\n  git clone {EXPECTED_URL}")
         if strict:
             sys.exit(1)
         return False
 
-    #print_success("✅", "Repository valid dan berasal dari sumber resmi.")
+    # print_success("Berhasil", "Repo valid, asli dari sumber resmi.")
     return True
 
 
@@ -77,15 +77,15 @@ def check_for_updates():
         remote = None
 
     if not remote or not local:
-        print_warning("⚠️", "Tidak dapat memeriksa versi terbaru.")
+        print_warning("Kesalahan", "Tidak dapat memeriksa versi terbaru.")
         return False
 
     if local != remote:
-        print_warning("⚠️", f"Versi terbaru tersedia (local {local[:7]} vs remote {remote[:7]})")
-        #print_panel("📑 Info", "Jalankan:\n[bold]git pull --rebase[/] untuk update.")
+        print_warning("Informasi", f"Ada update terbaru (local {local[:7]} vs remote {remote[:7]}).")
+        # print_panel("Informasi", "Jalankan pull rebase:\n[bold]git pull --rebase[/]")
         return True
 
-    #print_success("✅", "Repository sudah dalam versi terbaru.")
+    # print_success("Berhasil", "Repo sudah versi terbaru.")
     return False
 
 
