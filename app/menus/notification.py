@@ -1,125 +1,90 @@
-from app.config.imports import *
-from app.menus.util import clear_screen, pause, print_panel, simple_number, live_loading
+from datetime import datetime, timedelta
+from app.menus.util import clear_screen, pause
 from app.client.engsel import get_notification_detail, dashboard_segments
+from app.service.auth import AuthInstance
 
-console = Console()
+WIDTH = 55
+
+
+def format_timestamp(ts):
+    if ts is None or ts == "":
+        return "-"
+    try:
+        if isinstance(ts, (int, float)):
+            dt = datetime.utcfromtimestamp(ts) + timedelta(hours=7)
+            return dt.strftime("%d %B %Y | %H:%M WIB")
+        elif isinstance(ts, str) and ts.isdigit():
+            dt = datetime.utcfromtimestamp(int(ts)) + timedelta(hours=7)
+            return dt.strftime("%d %B %Y | %H:%M WIB")
+        elif isinstance(ts, str):
+            dt = datetime.fromisoformat(ts.replace("Z", "+00:00")) + timedelta(hours=7)
+            return dt.strftime("%d %B %Y | %H:%M WIB")
+    except Exception:
+        return "-"
+    return "-"
 
 
 def show_notification_menu():
-    theme = get_theme()
     in_notification_menu = True
     while in_notification_menu:
         clear_screen()
-        ensure_git()
-        console.print(Panel(
-            Align.center("📢 Notifications", vertical="middle"),
-            border_style=theme["border_info"],
-            padding=(1, 2),
-            expand=True
-        ))
-        simple_number()
+        print("🔍 Lagi ambil notifikasi bro...")
 
         api_key = AuthInstance.api_key
         tokens = AuthInstance.get_active_tokens()
 
-        with live_loading("🔄 Mengambil notifikasi...", theme):
-            notifications_res = dashboard_segments(api_key, tokens)
-
+        notifications_res = dashboard_segments(api_key, tokens)
         if not notifications_res:
-            print_panel("ℹ️ Info", "No notifications found.")
+            print("❌ Nggak ada notifikasi bro.")
             pause()
             return
 
         notifications = notifications_res.get("data", {}).get("notification", {}).get("data", [])
         if not notifications:
-            print_panel("ℹ️ Info", "No notifications available.")
+            print("⚠️ Belum ada notifikasi bro.")
             pause()
             return
 
+        print("=" * WIDTH)
+        print("🔔 Daftar Notifikasi".center(WIDTH))
+        print("=" * WIDTH)
         unread_count = 0
-        for idx, notification in enumerate(notifications, start=1):
+        for idx, notification in enumerate(notifications):
             is_read = notification.get("is_read", False)
-            full_message = notification.get("full_message", "")
-            brief_message = notification.get("brief_message", "")
-            time = notification.get("timestamp", "")
+            full_message = notification.get("full_message", "-")
+            formatted_time = format_timestamp(notification.get("timestamp"))
 
-            status = "READ" if is_read else "UNREAD"
+            status = "✅ READ" if is_read else "🔔 UNREAD"
             if not is_read:
                 unread_count += 1
 
-            notif_text = Text()
-            notif_text.append(f"🔔 Notification {idx}\n", style="bold")
-            notif_text.append("Status: ", style=theme["border_info"])
-            notif_text.append(f"{status}\n", style=theme["text_err"] if status == "UNREAD" else theme["text_ok"])
-            notif_text.append("Pesan Singkat: ", style=theme["border_info"])
-            notif_text.append(f"{brief_message}\n", style=theme["text_body"])
-            notif_text.append("Waktu: ", style=theme["border_info"])
-            notif_text.append(f"{time}\n", style=theme["border_warning"])
-            notif_text.append("Pesan Lengkap:\n", style=theme["border_info"])
-            notif_text.append(f"{full_message}\n", style=theme["text_body"])
+            print(f"[{idx + 1}.] Status: {status}")
+            print(f" 📅 Waktu: {formatted_time}")
+            print(f" 📝 Pesan: {full_message}")
+            print("-" * WIDTH)
 
-            console.print(Panel(
-                notif_text,
-                border_style=theme["border_info"],
-                padding=(0, 1),
-                expand=True
-            ))
+        print(f"📊 Total: {len(notifications)} | Unread: {unread_count}")
+        print("=" * WIDTH)
+        print(" [0.] Refresh 🔄")
+        print(" [1.] Tandai semua Unread jadi Read ✅")
+        print("[00.] Balik ke Menu Utama")
+        print("=" * WIDTH)
 
-        console.print(
-            f"[{theme['text_title']}]Total: {len(notifications)}[/] | "
-            f"[{theme['text_err']}]Unread: {unread_count}[/]"
-        )
-
-        nav_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
-        nav_table.add_column(justify="right", style=theme["text_key"], width=6)
-        nav_table.add_column(style=theme["text_body"])
-        nav_table.add_row("1", "Read All Unread Notifications")
-        nav_table.add_row("2", "Mark Single Notification as Read")
-        nav_table.add_row("00", f"[{theme['text_sub']}]Back to Main Menu[/]")
-
-        console.print(Panel(
-            nav_table,
-            border_style=theme["border_primary"],
-            padding=(0, 1),
-            expand=True
-        ))
-
-        choice = console.input(f"[{theme['text_sub']}]Pilihan:[/{theme['text_sub']}] ").strip()
-        if choice == "1":
+        choice = input("Pilih opsi: ").strip()
+        if choice == "0":
+            print("🔄 Refreshing notifikasi bro...")
+            continue
+        elif choice == "1":
             for notification in notifications:
                 if notification.get("is_read", False):
                     continue
                 notification_id = notification.get("notification_id")
                 detail = get_notification_detail(api_key, tokens, notification_id)
                 if detail:
-                    print_panel("✅ Info", f"Mark as READ notification ID: {notification_id}")
+                    print(f"✅ Notifikasi {notification_id} ditandai sebagai READ bro.")
             pause()
-
-        elif choice == "2":
-            nomor = console.input(f"[{theme['text_sub']}]Masukkan nomor notifikasi:[/{theme['text_sub']}] ").strip()
-            if not nomor.isdigit():
-                print_panel("❌ Error", "Nomor tidak valid.")
-                pause()
-                continue
-            nomor = int(nomor)
-            selected = next((n for i, n in enumerate(notifications, start=1) if i == nomor), None)
-            if not selected:
-                print_panel("❌ Error", "Nomor notifikasi tidak ditemukan.")
-                pause()
-                continue
-            if selected.get("is_read", False):
-                print_panel("ℹ️ Info", "Notifikasi sudah ditandai READ.")
-                pause()
-                continue
-            notification_id = selected.get("notification_id")
-            detail = get_notification_detail(api_key, tokens, notification_id)
-            if detail:
-                print_panel("✅ Info", f"Mark as READ notification ID: {notification_id}")
-            pause()
-
         elif choice == "00":
             in_notification_menu = False
-
         else:
-            print_panel("⚠️ Error", "Invalid choice. Please try again.")
+            print("⚠️ Input nggak valid bro. Coba lagi ✌️")
             pause()

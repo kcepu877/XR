@@ -1,67 +1,62 @@
 from datetime import datetime, timedelta
-
 from app.client.engsel import get_transaction_history
-from app.config.imports import *
-from app.menus.util import clear_screen, pause, print_panel, simple_number
+from app.menus.util import clear_screen, pause
 
-console = Console()
+WIDTH = 55
 
 
 def show_transaction_history(api_key, tokens):
-    theme = get_theme()
     in_transaction_menu = True
 
     while in_transaction_menu:
         clear_screen()
-        ensure_git()
-        console.print(Panel(
-            Align.center("📄 Riwayat Transaksi", vertical="middle"),
-            border_style=theme["border_info"],
-            padding=(1, 2),
-            expand=True
-        ))
-        simple_number()
+        print("=" * WIDTH)
+        print("📜 Riwayat Transaksi".center(WIDTH))
+        print("=" * WIDTH)
 
+        history = []
         try:
             data = get_transaction_history(api_key, tokens)
             history = data.get("list", [])
         except Exception as e:
-            print_panel("⚠️ Error", f"Gagal mengambil riwayat transaksi: {e}")
+            print(f"💥 Gagal ambil riwayat transaksi bro: {e}")
             history = []
 
         if not history:
-            print_panel("ℹ️ Info", "Tidak ada riwayat transaksi.")
+            print("❌ Belum ada riwayat transaksi bro.")
+            #pause()
         else:
             for idx, transaction in enumerate(history, start=1):
-                ts = transaction.get("timestamp", 0)
-                dt = datetime.fromtimestamp(ts) - timedelta(hours=7)
-                formatted_time = dt.strftime("%d %B %Y | %H:%M WIB")
+                transaction_timestamp = transaction.get("timestamp", 0)
+                try:
+                    dt = datetime.utcfromtimestamp(transaction_timestamp) + timedelta(hours=7)
+                    formatted_time = dt.strftime("%d %B %Y | %H:%M WIB")
+                except Exception:
+                    formatted_time = "-"
 
-                t = Table(box=MINIMAL_DOUBLE_HEAD, expand=True, padding=(0, 0))
-                t.add_column("Label", justify="left", style=theme["text_body"], width=18)
-                t.add_column("Detail", justify="right", style=theme["text_body"])
-                t.add_row("Judul", transaction.get("title", "-"))
-                t.add_row("Harga", f"Rp {transaction.get('price', '-')}")
-                t.add_row("Tanggal", formatted_time)
-                t.add_row("Metode", transaction.get("payment_method_label", "-"))
-                t.add_row("Status Transaksi", transaction.get("status", "-"))
-                t.add_row("Status Pembayaran", transaction.get("payment_status", "-"))
+                price_val = transaction.get("price", 0)
+                try:
+                    formatted_price = f"Rp{int(price_val):,}".replace(",", ".")
+                except Exception:
+                    formatted_price = str(price_val)
 
-                console.print(Panel(t, title=f"🧾 Transaksi #{idx}", border_style=theme["border_info"], expand=True))
+                print(f"[{idx}.] {transaction.get('title','-')} - {formatted_price}")
+                print(f"  📅 Tanggal: {formatted_time}")
+                print(f"  💳 Metode Pembayaran: {transaction.get('payment_method_label','-')}")
+                print(f"  📦 Status Transaksi: {transaction.get('status','-')}")
+                print(f"  💰 Status Pembayaran: {transaction.get('payment_status','-')}")
+                print("-" * WIDTH)
 
-        nav_table = Table(show_header=False, box=MINIMAL_DOUBLE_HEAD, expand=True)
-        nav_table.add_column(justify="right", style=theme["text_key"], width=6)
-        nav_table.add_column(justify="left", style=theme["text_body"])
-        nav_table.add_row("0", "Refresh")
-        nav_table.add_row("00", f"[{theme['text_sub']}]Kembali ke Menu Utama[/]")
+        print(" [0.] Refresh 🔄")
+        print("[00.] Balik ke Menu Utama")
+        print("-" * WIDTH)
+        choice = input("Pilih opsi: ").strip()
 
-        console.print(Panel(nav_table, border_style=theme["border_primary"], expand=True))
-
-        choice = console.input(f"[{theme['text_sub']}]Pilih opsi:[/{theme['text_sub']}] ").strip()
         if choice == "0":
+            print("🔄 Refreshing transaksi bro...")
             continue
         elif choice == "00":
-            return
+            in_transaction_menu = False
         else:
-            print_panel("⚠️ Error", "Opsi tidak valid. Silakan coba lagi.")
+            print("⚠️ Opsi nggak valid bro. Coba lagi ✌️")
             pause()
