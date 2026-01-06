@@ -23,9 +23,9 @@ def show_donate_menu():
     clear_screen()
     theme = get_theme()
     qris_url = (
-        "00020101021126570011ID.DANA.WWW011893600915324993094502092499309450303UMI"
-        "51440014ID.CO.QRIS.WWW0215ID10254398087220303UMI5204541153033605802ID5908BarbexID"
-        "6004011361054646563047A81"
+        "00020101021126610014COM.GO-JEK.WWW01189360091436578035570210G6578035570303UMI"
+        "51440014ID.CO.QRIS.WWW0215ID10243445558740303UMI5204549953033605802ID5922WARUNG DIGITAL, BNGKLN6009BANGKALAN"
+        "61056911262070703A016304DEE7"
     )
 
     with live_loading("Menyiapkan QRIS...", theme):
@@ -41,8 +41,8 @@ def show_donate_menu():
         "Dan jika ingin memberikan donasi untuk mendukung pengembangan tool ini, silakan gunakan metode berikut:\n\n",
         style=theme["text_body"]
     )
-    donate_info.append("- Dana: 0831-1921-5545\n", style=theme["text_body"])
-    donate_info.append("  A/N Joko S\n", style=theme["text_body"])
+    donate_info.append("- Dana: 0878-6116-7414\n", style=theme["text_body"])
+    donate_info.append("  A/N Saiful\n", style=theme["text_body"])
     donate_info.append("- QRIS tersedia di bawah\n\n", style=theme["text_body"])
     donate_info.append("Terima kasih atas dukungan Anda! 🙏", style=theme["text_sub"])
 
