@@ -11,6 +11,7 @@ _memory_cache = {}
 # Limit jumlah key di file cache (default 50)
 MAX_KEYS = 500  # bisa disesuaikan
 
+
 def _load_file_cache():
     if os.path.exists(CACHE_FILE):
         try:

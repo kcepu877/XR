@@ -328,7 +328,7 @@ def _load_config():
                 return json.load(f)
         except json.JSONDecodeError:
             pass
-    return {"active_theme": "emerald_glass"}
+    return {"active_theme": "dark_neon"}
 
 def _save_config(config):
     with open(CONFIG_PATH, "w", encoding="utf-8") as f:
@@ -336,7 +336,7 @@ def _save_config(config):
 
 def get_active_theme_name():
     config = _load_config()
-    return config.get("active_theme", "emerald_glass")
+    return config.get("active_theme", "dark_neon")
 
 _cached_theme = None
 _cached_theme_name = None
@@ -346,7 +346,7 @@ def get_theme(force_reload=False):
 
     if force_reload or _cached_theme is None:
         theme_name = get_active_theme_name()
-        _cached_theme = THEMES.get(theme_name, THEMES["emerald_glass"])
+        _cached_theme = THEMES.get(theme_name, THEMES["dark_neon"])
         _cached_theme_name = theme_name
 
     return _cached_theme
