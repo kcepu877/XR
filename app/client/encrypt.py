@@ -11,7 +11,7 @@ from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad
 from dataclasses import dataclass
 
-from app.service.crypto_helper import (
+from app.service.service_git import (
     encrypt_xdata,
     make_x_signature,
     make_x_signature_payment,
@@ -19,6 +19,7 @@ from app.service.crypto_helper import (
     make_x_signature_bounty,
     make_x_signature_loyalty,
     make_x_signature_bounty_allotment,
+    make_x_signature_balance_allotment,
     decrypt_xdata as dec_xdata,
     encrypt_circle_msisdn as encrypt_msisdn,
     decrypt_circle_msisdn as decrypt_msisdn,
@@ -27,7 +28,7 @@ from app.service.crypto_helper import (
 API_KEY = os.getenv("API_KEY")
 AES_KEY_ASCII = os.getenv("AES_KEY_ASCII")
 AX_FP_KEY = os.getenv("AX_FP_KEY")
-ENCRYPTED_FIELD_KEY = os.getenv("ENCRYPTED_FIELD_KEY")
+ENCRYPTED_FIELD_KEY = "5dccbf08920a5527"
 
 
 @dataclass
@@ -172,3 +173,13 @@ def encrypt_circle_msisdn(api_key: str, msisdn: str) -> str:
 
 def decrypt_circle_msisdn(api_key: str, encrypted_msisdn_b64: str) -> str:
     return decrypt_msisdn(encrypted_msisdn_b64)
+
+
+def get_x_signature_balance_allotment(
+    api_key: str,
+    path: str,
+    access_token: str,
+    msisdn: str,
+    amount: int,
+) -> str:
+    return make_x_signature_balance_allotment(path, access_token, msisdn, amount)
