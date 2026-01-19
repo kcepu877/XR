@@ -6,8 +6,13 @@ LOG_DIR = "logs"
 os.makedirs(LOG_DIR, exist_ok=True)
 
 
-def get_family_log_path(family_code: str):
-    return os.path.join(LOG_DIR, f"family_{family_code}.json")
+def get_family_log_path(family_code: str) -> str:
+    today = datetime.now().strftime("%Y-%m-%d")
+    dir_path = os.path.join(BASE_LOG_DIR, today)
+
+    os.makedirs(dir_path, exist_ok=True)
+
+    return os.path.join(dir_path, f"family-{family_code}.json")
 
 
 def init_family_log(family_code: str, family_name: str):
