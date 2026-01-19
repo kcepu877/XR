@@ -3,7 +3,7 @@ from random import randint
 import json
 from datetime import datetime
 
-
+from app2.utils.family_logger import init_family_log
 from app2.config.imports import *
 from app2.client.purchase.balance import settlement_balance
 from app.type_dict import PaymentItem
@@ -20,6 +20,9 @@ from app2.menus.util import (
 
 from app2.client.purchase.redeem import settlement_bounty
 from collections import defaultdict
+
+
+
 
 console = Console()
 
@@ -166,6 +169,42 @@ def redeem_looping(loop_count: int, pause_on_success=True):
 
     pause()
 
+def log_family_purchase(
+    family_code: str,
+    purchase_no: int,
+    variant: str,
+    option: str,
+    price: int,
+    response: dict | None,
+    exception: Exception | None = None
+):
+    path = get_family_log_path(family_code)
+
+    with open(path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    status = "SUCCESS" if response and response.get("status") == "SUCCESS" else "FAILED"
+
+    entry = {
+        "no": purchase_no,
+        "variant": variant,
+        "option": option,
+        "price": price,
+        "status": status,
+        "response": response if response else {
+            "exception": str(exception)
+        }
+    }
+
+    data["purchases"].append(entry)
+    data["summary"]["total_attempt"] += 1
+    if status == "SUCCESS":
+        data["summary"]["total_success"] += 1
+    else:
+        data["summary"]["total_failed"] += 1
+
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
 
 
 def purchase_loop(
@@ -269,6 +308,14 @@ def purchase_loop(
             False,
             overwrite_amount,
         )
+        log_family_purchase(
+    family_code=family_code,
+    purchase_no=purchase_count,
+    variant=variant_name,
+    option=f"{option_order}. {option_name}",
+    price=option_price,
+    response=res
+)
 
         if res and res.get("status", "") != "SUCCESS":
             error_msg = res.get("message", "Unknown error")
@@ -284,6 +331,14 @@ def purchase_loop(
                     False,
                     valid_amount,
                 )
+            log_family_purchase(
+    family_code=family_code,
+    purchase_no=purchase_count,
+    variant=variant_name,
+    option=f"{option_order}. {option_name}",
+    price=option_price,
+    response=res
+)
 
         if res and res.get("status", "") == "SUCCESS":
             print_panel("Sukses", "Pembelian berhasil")
@@ -293,6 +348,16 @@ def purchase_loop(
                     return False
 
     except Exception as e:
+        log_family_purchase(
+    family_code=family_code,
+    purchase_no=purchase_count,
+    variant=variant_name,
+    option=f"{option_order}. {option_name}",
+    price=option_price,
+    response=None,
+    exception=e
+)
+
         save_response_to_file(
         context={
             "source": "purchase_by_family",
@@ -370,6 +435,8 @@ def purchase_by_family(
         return None
     
     family_name = family_data["package_family"]["name"]
+    
+    init_family_log(family_code, family_name)
     variants = family_data["package_variants"]
     
     console.rule()
@@ -418,6 +485,16 @@ def purchase_by_family(
                     None,
                 )
             except Exception as e:
+                log_family_purchase(
+    family_code=family_code,
+    purchase_no=purchase_count,
+    variant=variant_name,
+    option=f"{option_order}. {option_name}",
+    price=option_price,
+    response=None,
+    exception=e
+)
+
                 save_response_to_file(
                     context={
                         "source": "purchase_by_family",
@@ -473,6 +550,15 @@ def purchase_by_family(
                     overwrite_amount=overwrite_amount,
                     token_confirmation_idx=1
                 )
+                log_family_purchase(
+    family_code=family_code,
+    purchase_no=purchase_count,
+    variant=variant_name,
+    option=f"{option_order}. {option_name}",
+    price=option_price,
+    response=res
+)
+
                 save_response_to_file(
     context={
         "source": "purchase_by_family",
@@ -504,7 +590,15 @@ def purchase_by_family(
                             overwrite_amount=valid_amount,
                             token_confirmation_idx=-1
                         )
-                        
+                        log_family_purchase(
+    family_code=family_code,
+    purchase_no=purchase_count,
+    variant=variant_name,
+    option=f"{option_order}. {option_name}",
+    price=option_price,
+    response=res
+)
+
                         save_response_to_file(
     context={
         "source": "purchase_by_family",
@@ -536,6 +630,16 @@ def purchase_by_family(
                         pause()
 
             except Exception as e:
+                log_family_purchase(
+    family_code=family_code,
+    purchase_no=purchase_count,
+    variant=variant_name,
+    option=f"{option_order}. {option_name}",
+    price=option_price,
+    response=None,
+    exception=e
+)
+
                 save_response_to_file(
                     context={
                         "source": "purchase_by_family",
@@ -654,6 +758,16 @@ def purchase_n_times(
                 None,
             )
         except Exception as e:
+            log_family_purchase(
+    family_code=family_code,
+    purchase_no=purchase_count,
+    variant=variant_name,
+    option=f"{option_order}. {option_name}",
+    price=option_price,
+    response=None,
+    exception=e
+)
+
             print_panel("Kesalahan", f"Terjadi error saat mengambil detail paket: {e}")
             console.print(f"Gagal mengambil detail untuk {target_variant['name']} - {option_name}. Dilewati sementara.")
             continue
@@ -695,7 +809,15 @@ def purchase_n_times(
                 overwrite_amount=overwrite_amount,
                 token_confirmation_idx=token_confirmation_idx
             )
-            
+            log_family_purchase(
+    family_code=family_code,
+    purchase_no=purchase_count,
+    variant=variant_name,
+    option=f"{option_order}. {option_name}",
+    price=option_price,
+    response=res
+)
+
             if res and res.get("status", "") != "SUCCESS":
                 error_msg = res.get("message", "Unknown error")
                 if "Bizz-err.Amount.Total" in error_msg:
@@ -711,6 +833,15 @@ def purchase_n_times(
                         overwrite_amount=valid_amount,
                         token_confirmation_idx=token_confirmation_idx
                     )
+                    log_family_purchase(
+    family_code=family_code,
+    purchase_no=purchase_count,
+    variant=variant_name,
+    option=f"{option_order}. {option_name}",
+    price=option_price,
+    response=res
+)
+
                     if res and res.get("status", "") == "SUCCESS":
                         successful_purchases.append(
                             f"{target_variant['name']}|{option_order}. {option_name} - Rp{option_price}"
@@ -727,6 +858,16 @@ def purchase_n_times(
                     pause()
 
         except Exception as e:
+            log_family_purchase(
+    family_code=family_code,
+    purchase_no=purchase_count,
+    variant=variant_name,
+    option=f"{option_order}. {option_name}",
+    price=option_price,
+    response=None,
+    exception=e
+)
+
             save_response_to_file(
                 context={
                     "source": "purchase_by_family",
@@ -814,6 +955,16 @@ def purchase_n_times_by_option_code(
             
             target_package_detail = get_package(api_key, tokens, option_code)
         except Exception as e:
+            log_family_purchase(
+    family_code=family_code,
+    purchase_no=purchase_count,
+    variant=variant_name,
+    option=f"{option_order}. {option_name}",
+    price=option_price,
+    response=None,
+    exception=e
+)
+
             print_panel("Kesalahan", f"Terjadi error saat mengambil detail paket: {e}")
             continue
 
@@ -854,7 +1005,15 @@ def purchase_n_times_by_option_code(
                 overwrite_amount=overwrite_amount,
                 token_confirmation_idx=token_confirmation_idx
             )
-            
+            log_family_purchase(
+    family_code=family_code,
+    purchase_no=purchase_count,
+    variant=variant_name,
+    option=f"{option_order}. {option_name}",
+    price=option_price,
+    response=res
+)
+
             if res and res.get("status", "") != "SUCCESS":
                 error_msg = res.get("message", "Unknown error")
                 if "Bizz-err.Amount.Total" in error_msg:
@@ -870,6 +1029,15 @@ def purchase_n_times_by_option_code(
                         overwrite_amount=valid_amount,
                         token_confirmation_idx=token_confirmation_idx
                     )
+                    log_family_purchase(
+    family_code=family_code,
+    purchase_no=purchase_count,
+    variant=variant_name,
+    option=f"{option_order}. {option_name}",
+    price=option_price,
+    response=res
+)
+
                     if res and res.get("status", "") == "SUCCESS":
                         successful_purchases.append(f"Purchase {i + 1}")
                         print_panel("Sukses", "Pembelian berhasil")
@@ -881,6 +1049,16 @@ def purchase_n_times_by_option_code(
                 if pause_on_success:
                     pause()
         except Exception as e:
+            log_family_purchase(
+    family_code=family_code,
+    purchase_no=purchase_count,
+    variant=variant_name,
+    option=f"{option_order}. {option_name}",
+    price=option_price,
+    response=None,
+    exception=e
+)
+
             save_response_to_file(
                 context={
                     "source": "purchase_by_family",
