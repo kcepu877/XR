@@ -378,23 +378,23 @@ def purchase_loop(
 
     return True
 
-def save_response_to_file(context: dict, response=None, exception=None):
-    record = {
-        "timestamp": datetime.now().isoformat(),
-        "context": context,
-    }
+# def save_response_to_file(context: dict, response=None, exception=None):
+   # record = {
+     #   "timestamp": datetime.now().isoformat(),
+     #   "context": context,
+  #  }
 
-    if response is not None:
-        record["response"] = response
+  #  if response is not None:
+     #   record["response"] = response
 
-    if exception is not None:
-        record["exception"] = {
-            "type": type(exception).__name__,
-            "message": str(exception),
-        }
+ #   if exception is not None:
+   #     record["exception"] = {
+       #     "type": type(exception).__name__,
+      #      "message": str(exception),
+   #     }
 
-    with open("result.json", "a", encoding="utf-8") as f:
-        f.write(json.dumps(record, ensure_ascii=False) + "\n")
+  #  with open("result.json", "a", encoding="utf-8") as f:
+     #   f.write(json.dumps(record, ensure_ascii=False) + "\n")
 
 
 def purchase_by_family(
