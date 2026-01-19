@@ -358,19 +358,19 @@ def purchase_loop(
     exception=e
 )
 
-        save_response_to_file(
-        context={
-            "source": "purchase_by_family",
-            "stage": "purchase_exception",
-            "family": family_name,
-            "variant": variant_name,
-            "option_order": option_order,
-            "option_name": option_name,
-            "price": option_price,
-            "use_decoy": use_decoy,
-        },
-        exception=e
-    )
+       # save_response_to_file(
+       # context={
+        #    "source": "purchase_by_family",
+        #    "stage": "purchase_exception",
+         #   "family": family_name,
+          #  "variant": variant_name,
+         #   "option_order": option_order,
+       #     "option_name": option_name,
+         #   "price": option_price,
+         #   "use_decoy": use_decoy,
+    #    },
+      #  exception=e
+  #  )
     print_panel("Kesalahan", f"Terjadi error saat membuat order: {e}")
 
     if delay > 0:
@@ -495,17 +495,17 @@ def purchase_by_family(
     exception=e
 )
 
-                save_response_to_file(
-                    context={
-                        "source": "purchase_by_family",
-                        "stage": "exception",
-                        "family": family_name,
-                        "variant": variant_name,
-                        "option_order": option_order,
-                        "option_name": option_name,
-                    },
-                    exception=e
-                )
+             #   save_response_to_file(
+              #      context={
+               #         "source": "purchase_by_family",
+                 #       "stage": "exception",
+                   #     "family": family_name,
+                   #     "variant": variant_name,
+                   #     "option_order": option_order,
+                    #    "option_name": option_name,
+                #    },
+              #      exception=e
+             #   )
                 print_panel("Kesalahan", f"Terjadi error saat membuat order: {e}")
                 continue
 
@@ -559,20 +559,20 @@ def purchase_by_family(
     response=res
 )
 
-                save_response_to_file(
-    context={
-        "source": "purchase_by_family",
-        "stage": "initial_purchase",
-        "family": family_name,
-        "variant": variant_name,
-        "option_order": option_order,
-        "option_name": option_name,
-        "price": option_price,
-        "overwrite_amount": overwrite_amount,
-        "use_decoy": use_decoy,
-    },
-    response=res
-)
+             #   save_response_to_file(
+   # context={
+      #  "source": "purchase_by_family",
+       # "stage": "initial_purchase",
+      #  "family": family_name,
+      #  "variant": variant_name,
+     #   "option_order": option_order,
+     #   "option_name": option_name,
+      #  "price": option_price,
+      #  "overwrite_amount": overwrite_amount,
+       # "use_decoy": use_decoy,
+   # },
+   # response=res
+#)
 
                 
                 if res and res.get("status", "") != "SUCCESS":
@@ -599,20 +599,20 @@ def purchase_by_family(
     response=res
 )
 
-                        save_response_to_file(
-    context={
-        "source": "purchase_by_family",
-        "stage": "retry_amount_fix",
-        "family": family_name,
-        "variant": variant_name,
-        "option_order": option_order,
-        "option_name": option_name,
-        "original_price": option_price,
-        "fixed_amount": valid_amount,
-        "use_decoy": use_decoy,
-    },
-    response=res
-)
+                #        save_response_to_file(
+   # context={
+      #  "source": "purchase_by_family",
+     #   "stage": "retry_amount_fix",
+    #    "family": family_name,
+      #  "variant": variant_name,
+     #   "option_order": option_order,
+      #  "option_name": option_name,
+     #   "original_price": option_price,
+     #   "fixed_amount": valid_amount,
+   #     "use_decoy": use_decoy,
+  #  },
+  #  response=res
+#)
 
 
                         if res and res.get("status", "") == "SUCCESS":
@@ -640,19 +640,19 @@ def purchase_by_family(
     exception=e
 )
 
-                save_response_to_file(
-                    context={
-                        "source": "purchase_by_family",
-                        "stage": "purchase_exception",
-                        "family": family_name,
-                        "variant": variant_name,
-                        "option_order": option_order,
-                        "option_name": option_name,
-                        "price": option_price,
-                        "use_decoy": use_decoy,
-                    },
-                    exception=e
-                )
+              #  save_response_to_file(
+               #     context={
+                  #      "source": "purchase_by_family",
+                    #    "stage": "purchase_exception",
+                       # "family": family_name,
+                      #  "variant": variant_name,
+                       # "option_order": option_order,
+                       # "option_name": option_name,
+                       # "price": option_price,
+                       # "use_decoy": use_decoy,
+                   # },
+                   # exception=e
+             #   )
                 print_panel("Kesalahan", f"Terjadi error saat membuat order: {e}")
 
             
@@ -868,19 +868,19 @@ def purchase_n_times(
     exception=e
 )
 
-            save_response_to_file(
-                context={
-                    "source": "purchase_by_family",
-                    "stage": "purchase_exception",
-                    "family": family_name,
-                    "variant": variant_name,
-                    "option_order": option_order,
-                    "option_name": option_name,
-                    "price": option_price,
-                    "use_decoy": use_decoy,
-                },
-                exception=e
-            )
+         #   save_response_to_file(
+               # context={
+                #    "source": "purchase_by_family",
+                  #  "stage": "purchase_exception",
+                 #   "family": family_name,
+                 #   "variant": variant_name,
+                 #   "option_order": option_order,
+                #    "option_name": option_name,
+                   # "price": option_price,
+                  #  "use_decoy": use_decoy,
+             #   },
+               # exception=e
+         #   )
             print_panel("Kesalahan", f"Terjadi error saat membuat order: {e}")
 
 
@@ -1059,19 +1059,19 @@ def purchase_n_times_by_option_code(
     exception=e
 )
 
-            save_response_to_file(
-                context={
-                    "source": "purchase_by_family",
-                    "stage": "purchase_exception",
-                    "family": family_name,
-                    "variant": variant_name,
-                    "option_order": option_order,
-                    "option_name": option_name,
-                    "price": option_price,
-                    "use_decoy": use_decoy,
-                },
-                exception=e
-            )
+           # save_response_to_file(
+            #    context={
+               #     "source": "purchase_by_family",
+                #    "stage": "purchase_exception",
+                  #  "family": family_name,
+                 #   "variant": variant_name,
+                  #  "option_order": option_order,
+                 #   "option_name": option_name,
+                  #  "price": option_price,
+                 #   "use_decoy": use_decoy,
+               # },
+             #   exception=e
+         #   )
             print_panel("Kesalahan", f"Terjadi error saat membuat order: {e}")
 
         
