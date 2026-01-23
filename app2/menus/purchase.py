@@ -1,5 +1,8 @@
 import requests, time
 from random import randint
+import json
+from datetime import datetime
+import os
 
 from app2.config.imports import *
 from app2.client.purchase.balance import settlement_balance
@@ -298,12 +301,14 @@ def purchase_loop(
     return True
 
 
+
 def purchase_by_family(
     family_code: str,
     use_decoy: bool,
     pause_on_success: bool = True,
     delay_seconds: int = 0,
     start_from_option: int = 1,
+    save_to_json: bool = True,  # Parameter baru untuk kontrol penyimpanan JSON
 ):
     theme = get_theme()
     ensure_git()
@@ -340,6 +345,7 @@ def purchase_by_family(
     
     console.rule()
     successful_purchases = []
+    failed_purchases = []  # Tambahkan untuk mencatat yang gagal
     packages_count = sum(len(v["package_options"]) for v in variants)
     
     purchase_count = 0
@@ -364,6 +370,7 @@ def purchase_by_family(
             console.print(f"Melanjutkan pembelian: {variant_name} - {option_order}. {option_name} - Rp{option_price}")
             
             payment_items = []
+            error_msg = ""
             
             try:
                 if use_decoy:                
@@ -384,7 +391,16 @@ def purchase_by_family(
                     None,
                 )
             except Exception as e:
-                print_panel("Kesalahan", f"Terjadi error saat mengambil detail paket: {e}")
+                error_msg = f"Error mengambil detail paket: {str(e)}"
+                print_panel("Kesalahan", error_msg)
+                failed_purchases.append({
+                    "variant_name": variant_name,
+                    "option_order": option_order,
+                    "option_name": option_name,
+                    "price": option_price,
+                    "error": error_msg,
+                    "timestamp": datetime.now().isoformat()
+                })
                 console.print(f"Gagal mengambil detail untuk {variant_name} - {option_name}. Dilewati sementara.")
                 continue
 
@@ -414,8 +430,6 @@ def purchase_by_family(
             overwrite_amount = target_package_detail["package_option"]["price"]
             if use_decoy or overwrite_amount == 0:
                 overwrite_amount += decoy_package_detail["package_option"]["price"]
-                
-            error_msg = ""
 
             try:
                 res = settlement_balance(
@@ -428,8 +442,23 @@ def purchase_by_family(
                     token_confirmation_idx=1
                 )
                 
+                purchase_result = {
+                    "variant_name": variant_name,
+                    "option_order": option_order,
+                    "option_name": option_name,
+                    "price": option_price,
+                    "status": "",
+                    "message": "",
+                    "timestamp": datetime.now().isoformat(),
+                    "overwrite_amount": overwrite_amount
+                }
+                
                 if res and res.get("status", "") != "SUCCESS":
                     error_msg = res.get("message", "")
+                    purchase_result["status"] = "FAILED"
+                    purchase_result["message"] = error_msg
+                    failed_purchases.append(purchase_result)
+                    
                     if "Bizz-err.Amount.Total" in error_msg:
                         error_msg_arr = error_msg.split("=")
                         valid_amount = int(error_msg_arr[1].strip())
@@ -444,36 +473,136 @@ def purchase_by_family(
                             token_confirmation_idx=-1
                         )
                         if res and res.get("status", "") == "SUCCESS":
-                            error_msg = ""
-                            successful_purchases.append(f"{variant_name}|{option_order}. {option_name} - Rp{option_price}")
+                            purchase_result["status"] = "SUCCESS"
+                            purchase_result["message"] = "Purchase successful after amount adjustment"
+                            purchase_result["adjusted_amount"] = valid_amount
+                            successful_purchases.append(purchase_result)
                             print_panel("Sukses", "Pembelian berhasil")
                             if pause_on_success:
                                 pause()
                         else:
                             error_msg = res.get("message", "")
+                            purchase_result["status"] = "FAILED"
+                            purchase_result["message"] = error_msg
+                            failed_purchases.append(purchase_result)
                 else:
-                    successful_purchases.append(f"{variant_name}|{option_order}. {option_name} - Rp{option_price}")
+                    purchase_result["status"] = "SUCCESS"
+                    purchase_result["message"] = "Purchase successful"
+                    successful_purchases.append(purchase_result)
                     print_panel("Sukses", "Pembelian berhasil")
                     if pause_on_success:
                         pause()
 
             except Exception as e:
-                print_panel("Kesalahan", f"Terjadi error saat membuat order: {e}")
+                error_msg = f"Error membuat order: {str(e)}"
+                purchase_result = {
+                    "variant_name": variant_name,
+                    "option_order": option_order,
+                    "option_name": option_name,
+                    "price": option_price,
+                    "status": "FAILED",
+                    "message": error_msg,
+                    "timestamp": datetime.now().isoformat()
+                }
+                failed_purchases.append(purchase_result)
+                print_panel("Kesalahan", error_msg)
             
             console.rule()
             should_delay = error_msg == "" or "Failed call ipaas purchase" in error_msg
             if delay_seconds > 0 and should_delay:
                 delay_inline(delay_seconds)
 
+    # Tampilkan hasil akhir
     console.print(f"[{theme['text_title']}]Family: {family_name}[/]")
     console.print(f"Total berhasil: {len(successful_purchases)}")
+    console.print(f"Total gagal: {len(failed_purchases)}")
+    
     if successful_purchases:
         console.rule()
         console.print("Daftar pembelian sukses:")
         for purchase in successful_purchases:
-            console.print(f"- {purchase}")
+            console.print(f"- {purchase['variant_name']}|{purchase['option_order']}. {purchase['option_name']} - Rp{purchase['price']}")
+    
+    if failed_purchases:
+        console.rule()
+        console.print("Daftar pembelian gagal:")
+        for purchase in failed_purchases:
+            console.print(f"- {purchase['variant_name']}|{purchase['option_order']}. {purchase['option_name']} - Rp{purchase['price']}")
+    
+    # Simpan ke file JSON jika diminta
+    if save_to_json:
+        save_purchase_results_to_json(
+            family_code=family_code,
+            family_name=family_name,
+            successful_purchases=successful_purchases,
+            failed_purchases=failed_purchases,
+            use_decoy=use_decoy,
+            start_from_option=start_from_option
+        )
+    
     console.rule()
     pause()
+    return None
+
+
+def save_purchase_results_to_json(
+    family_code: str,
+    family_name: str,
+    successful_purchases: list,
+    failed_purchases: list,
+    use_decoy: bool,
+    start_from_option: int
+):
+    """Menyimpan hasil pembelian ke file JSON"""
+    
+    # Buat direktori results jika belum ada
+    results_dir = "purchase_results"
+    if not os.path.exists(results_dir):
+        os.makedirs(results_dir)
+    
+    # Format nama file
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = f"{family_code}_{timestamp}.json"
+    filepath = os.path.join(results_dir, filename)
+    
+    # Struktur data untuk disimpan
+    result_data = {
+        "metadata": {
+            "family_code": family_code,
+            "family_name": family_name,
+            "timestamp": datetime.now().isoformat(),
+            "use_decoy": use_decoy,
+            "start_from_option": start_from_option,
+            "total_successful": len(successful_purchases),
+            "total_failed": len(failed_purchases)
+        },
+        "successful_purchases": successful_purchases,
+        "failed_purchases": failed_purchases,
+        "summary": {
+            "success_rate": f"{len(successful_purchases)}/{len(successful_purchases) + len(failed_purchases)}",
+            "total_amount_successful": sum(p.get("price", 0) for p in successful_purchases),
+            "total_amount_failed": sum(p.get("price", 0) for p in failed_purchases)
+        }
+    }
+    
+    # Simpan ke file JSON
+    try:
+        with open(filepath, 'w', encoding='utf-8') as f:
+            json.dump(result_data, f, ensure_ascii=False, indent=2)
+        
+        console.print(f"[green]✓ Hasil pembelian disimpan ke: {filepath}[/green]")
+        
+        # Juga simpan dengan nama family_code saja (overwrite yang terbaru)
+        latest_filepath = os.path.join(results_dir, f"{family_code}_latest.json")
+        with open(latest_filepath, 'w', encoding='utf-8') as f:
+            json.dump(result_data, f, ensure_ascii=False, indent=2)
+        
+        console.print(f"[green]✓ Salinan terbaru disimpan ke: {latest_filepath}[/green]")
+        
+    except Exception as e:
+        console.print(f"[red]✗ Gagal menyimpan hasil ke JSON: {e}[/red]")
+    
+    return filepath
 
 
 def purchase_n_times(
@@ -784,3 +913,4 @@ def purchase_n_times_by_option_code(
             console.print(f"{idx}. {purchase}")
     console.rule()
     return True
+
