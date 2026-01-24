@@ -5,18 +5,18 @@ sudo apt update -y && sudo apt upgrade -y
 
 # Install dependensi
 sudo apt install git python3.8 python3.8-venv python3.8-dev python3-pip -y
-
+cd /usr/local/sbin
 # Clone repository
 sudo git clone https://github.com/kcepu877/XR /usr/local/sbin/XR
-
-# Masuk ke direktori
-cd /usr/local/sbin/XR || exit
-
-# Buat virtual environment dengan Python 3.8
 python3.8 -m venv venv
 
 # Aktifkan virtual environment
 source venv/bin/activate
+# Masuk ke direktori
+cd XR || exit
+
+# Buat virtual environment dengan Python 3.8
+
 
 # Upgrade pip
 pip install --upgrade pip setuptools wheel
