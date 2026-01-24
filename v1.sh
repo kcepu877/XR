@@ -1,16 +1,16 @@
-sudo apt update -y && sudo apt upgrade -y
-sudo apt install git -y
+sudo apt update && sudo apt install -y git python3.8 python3.8-venv
+
 python3.8 -m venv venv
 source venv/bin/activate
 
-git clone https://github.com/kcepu877/XR /usr/local/sbin
+cd /usr/local/sbin
+git clone https://github.com/kcepu877/XR
 
 cd XR
-apt update -y
-apt install python -y
-apt install python-pillow -y
-pip install --upgrade rich
+pip install --upgrade pip
+pip install rich
 pip install -r requirements.txt
+
 
 # Buat script untuk fix semua Union types
 cat > fix_union_types.py << 'EOF'
