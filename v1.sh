@@ -2,8 +2,7 @@ sudo apt update -y && sudo apt upgrade -y
 sudo apt install git -y
 python3.8 -m venv venv
 source venv/bin/activate
-git clone https://github.com/kcepu877/XR
-
+git clone https://github.com/kcepu877/XR /usr/local/sbin
 cd xr
 apt update -y
 apt install python -y
