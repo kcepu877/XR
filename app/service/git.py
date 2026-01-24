@@ -13,7 +13,7 @@ from app2.menus.util import print_error, print_success, print_warning, print_pan
 console = Console()
 
 OWNER = "kcepu877"
-REPO = "xr"
+REPO = "XR"
 BRANCH = "main"
 EXPECTED_URL = f"https://github.com/{OWNER}/{REPO}"
 
