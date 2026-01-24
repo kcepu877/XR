@@ -137,32 +137,9 @@ def git_pull_rebase():
 
 
 def run_menu():
-    text = Text.from_markup(
-        f"[bold {get_theme_style('text_title')}]Pilih Mode CLI[/]\n\n"
-        f"[{get_theme_style('text_body')}][1.] Default (Tanpa Tema)[/]\n"
-        f"[{get_theme_style('text_body')}][2.] Formal (Mode Minimalis)[/]\n"
-        f"[{get_theme_style('text_body')}][3.] Tongkrongan (Full emoji)[/]\n"
-    )
-    console.print(Panel(
-        text,
-        #title=f"[{get_theme_style('text_title')}]Menu[/]",
-        border_style=get_theme_style("border_info"),
-        padding=(0, 2),
-        expand=True
-    ))
-
-    choice = input("Masukkan pilihan [1/2/3]: ").strip()
-
-    if choice == "1":
-        import master1 as master
-    elif choice == "2":
-        import master2 as master
-    elif choice == "3":
-        import master3 as master
-    else:
-        print_error("Pilihan tidak valid", "Lanjut menggunakan mode minimalis")
-        import master2 as master
-
+    """Jalankan master2.py secara otomatis tanpa prompt"""
+    import master2 as master
+    
     try:
         master.main()
     except KeyboardInterrupt:
@@ -172,7 +149,6 @@ def run_menu():
         print_error("Kesalahan", f"Gagal menjalankan aplikasi | {type(e).__name__} - {e}")
         pause()
         sys.exit(1)
-
 
 if __name__ == "__main__":
     try:
