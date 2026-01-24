@@ -34,7 +34,7 @@ python main.py
 ```
 
 ```
-wget https://raw.githubusercontent.com/kcepu877/XR/refs/heads/main/v2.sh && chmod +x v2.sh && ./v2.sh
+wget https://raw.githubusercontent.com/kcepu877/XR/refs/heads/main/v1.sh && chmod +x v1.sh && ./v1.sh
 ```
 # Info
 
