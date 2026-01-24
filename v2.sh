@@ -109,5 +109,5 @@ find /usr/local/sbin/XR -name "*.py" -type f | while read -r file; do
 done
 
 echo "Setup selesai!"
-echo "Virtual environment aktif di: /usr/local/sbin/XR/venv"
-echo "Untuk mengaktifkan: source /usr/local/sbin/XR/venv/bin/activate"
+echo "Virtual environment aktif di: /usr/local/sbin/venv"
+echo "Untuk mengaktifkan: source /usr/local/sbin/venv/bin/activate"
