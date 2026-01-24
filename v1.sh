@@ -2,8 +2,10 @@ sudo apt update -y && sudo apt upgrade -y
 sudo apt install git -y
 python3.8 -m venv venv
 source venv/bin/activate
+
 git clone https://github.com/kcepu877/XR /usr/local/sbin
-cd xr
+
+cd XR
 apt update -y
 apt install python -y
 apt install python-pillow -y
@@ -11,7 +13,7 @@ pip install --upgrade rich
 pip install -r requirements.txt
 
 # Tambahkan ke SEMUA file Python di project
-find /root/xr -name "*.py" -type f | while read file; do
+find  -name "*.py" -type f | while read file; do
     # Cek jika belum ada future import
     if ! head -5 "$file" | grep -q "__future__"; then
         # Backup
