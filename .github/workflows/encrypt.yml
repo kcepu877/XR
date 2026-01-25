@@ -3,106 +3,111 @@ name: 🌐 Universal Code Obfuscator
 on:
   workflow_dispatch:
     inputs:
-      file_types:
-        description: 'File extensions to obfuscate (comma-separated)'
+      extensions:
+        description: 'File extensions to process (comma separated)'
         required: false
-        default: 'sh,py,js'
+        default: 'py,sh,js'
 
 jobs:
-  obfuscate:
+  obfuscate-all:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-
+    
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout Repository
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
-
-    - name: Multi-language Obfuscation
-      env:
-        FILE_TYPES: ${{ github.event.inputs.file_types || 'sh,py,js' }}
+        token: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Obfuscate Multiple File Types
       run: |
-        IFS=',' read -ra TYPES <<< "$FILE_TYPES"
+        # Split extensions from input
+        IFS=',' read -ra EXT_ARRAY <<< "${{ github.event.inputs.extensions || 'py,sh,js' }}"
         
-        for ext in "${TYPES[@]}"; do
-          echo "🔧 Processing .$ext files..."
+        for ext in "${EXT_ARRAY[@]}"; do
+          echo "🧪 Processing .$ext files..."
           
-          find . -type f -name "*.$ext" | while read -r file; do
-            echo "⚡ Processing: $file"
+          # Find all files with this extension
+          find . -type f -name "*.$ext" ! -path "./.git/*" | while read -r file; do
+            echo "🔧 Processing: $file"
             
             case "$ext" in
-              "sh")
-                # Bash obfuscation
-                temp_content=$(
-                  echo '#!/bin/bash'
-                  echo '# 🔥 AUTO-OBFUSCATED'
-                  echo 'eval "$(base64 -d <<<"'
-                  base64 "$file" | tr -d '\n'
-                  echo '")"'
-                )
+              sh)
+                # BASH/SH OBFUSCATION
+                encoded=$(base64 -w 0 "$file")
+                cat > "${file}.tmp" << EOF
+#!/bin/bash
+# 🔥 OBFUSCATED - $(basename "$file")
+eval "\$(echo "$encoded" | base64 -d)"
+EOF
                 ;;
                 
-              "py")
-                # Python obfuscation with multiple encoding
-                temp_content=$(python3 -c "
-import base64, zlib, marshal
-with open('$file', 'rb') as f:
-    code = f.read()
-# Multiple encoding layers
-marshaled = marshal.dumps(compile(code, '<string>', 'exec'))
-compressed = zlib.compress(marshaled, 9)
-encoded = base64.b64encode(compressed).decode()
+              py)
+                # PYTHON OBFUSCATION
+                encoded=$(base64 -w 0 "$file")
+                cat > "${file}.tmp" << EOF
+#!/usr/bin/env python3
+# 🔥 OBFUSCATED - $(basename "$file")
+import base64, sys
 
-template = '''#!/usr/bin/env python3
-# 🔥 AUTO-OBFUSCATED
-import base64, zlib, marshal, sys
-
-ENCODED = \"\"\"{encoded}\"\"\"
+CODE = """$encoded"""
 
 try:
-    decoded = base64.b64decode(ENCODED)
-    decompressed = zlib.decompress(decoded)
-    exec(marshal.loads(decompressed))
+    exec(base64.b64decode(CODE).decode('utf-8'))
 except Exception as e:
-    print(f'Decode error: {{e}}')
+    print(f"[Obfuscation Error] {e}")
     sys.exit(1)
-'''
-print(template)
-")
+EOF
                 ;;
                 
-              "js")
-                # JavaScript obfuscation
-                temp_content=$(
-                  echo '#!/usr/bin/env node'
-                  echo '// 🔥 AUTO-OBFUSCATED'
-                  echo 'const encoded = "'
-                  base64 "$file" | tr -d '\n'
-                  echo '";'
-                  echo 'try {'
-                  echo '  eval(Buffer.from(encoded, "base64").toString());'
-                  echo '} catch(e) {'
-                  echo '  console.error("Decode error:", e);'
-                  echo '}'
-                )
+              js)
+                # JAVASCRIPT OBFUSCATION
+                encoded=$(base64 -w 0 "$file")
+                cat > "${file}.tmp" << EOF
+#!/usr/bin/env node
+// 🔥 OBFUSCATED - $(basename "$file")
+const encoded = "$encoded";
+const Buffer = require('buffer').Buffer;
+
+try {
+    eval(Buffer.from(encoded, 'base64').toString());
+} catch(e) {
+    console.error("[Obfuscation Error]", e);
+    process.exit(1);
+}
+EOF
+                ;;
+                
+              *)
+                echo "⚠️ Unknown extension: .$ext"
+                continue
                 ;;
             esac
             
-            # Save file
-            echo "$temp_content" > "$file.tmp"
-            mv -f "$file.tmp" "$file"
-            chmod +x "$file"
-            echo "✅ Obfuscated: $file"
+            # Replace original file
+            if [ -f "${file}.tmp" ]; then
+              mv -f "${file}.tmp" "$file"
+              chmod +x "$file"
+              echo "✅ Obfuscated: $file"
+            fi
           done
           
-          echo "📊 Total .$ext files: $(find . -type f -name "*.$ext" | wc -l)"
+          echo "📊 Total .$ext files: $(find . -type f -name "*.$ext" ! -path "./.git/*" | wc -l)"
         done
-
-    - name: Commit Changes
+    
+    - name: Commit & Push Changes
       run: |
-        git config --global user.name "Universal-Obfuscator"
-        git config --global user.email "noreply@gh"
-        git add .
-        git commit -m "🌐 Multi-language obfuscation [$(date +'%Y%m%d-%H%M%S')]" || echo "No changes"
-        git push
+        git config --global user.name "GitHub Actions Bot"
+        git config --global user.email "actions@github.com"
+        
+        # Check if there are changes
+        if git diff --quiet && git diff --staged --quiet; then
+          echo "🤷 No changes to commit"
+        else
+          git add -A
+          git commit -m "🌐 Auto-obfuscate: ${{ github.event.inputs.extensions || 'py,sh,js' }} [$(date +'%Y-%m-%d %H:%M:%S')]"
+          git push
+          echo "🚀 Changes pushed successfully"
+        fi
