@@ -1,45 +1,44 @@
-name: 🛡️ Rollback via Protected Branch
+name: 🚀 Rollback dengan Token Khusus
 
 on:
-  workflow_dispatch:
-    inputs:
-      commit_hash:
-        description: 'Commit hash to rollback to'
-        required: true
-        default: '7f4fb63d06f4a60fe822d57733d86317df759f76'
+  workflow_dispatch:  # Hanya manual trigger
 
 jobs:
-  rollback:
+  force-rollback:
     runs-on: ubuntu-latest
     
     steps:
-      # Step 1: Create branch dari commit target
-      - name: 🌿 Create Rollback Branch
+      - name: 📥 Checkout dengan Token Khusus
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.inputs.commit_hash }}
-          
-      - name: Push as New Branch
+          fetch-depth: 0
+          token: ${{ secrets.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 }}  # <- Token Anda di sini
+      
+      - name: 🛠️ Setup Git
         run: |
-          BRANCH_NAME="rollback-$(date +%s)"
-          git checkout -b "$BRANCH_NAME"
-          git push origin "$BRANCH_NAME" --force
-          echo "📌 Branch created: $BRANCH_NAME"
-          echo "👉 Create PR from $BRANCH_NAME to main"
+          git config --global user.name "Rollback Bot"
+          git config --global user.email "bot@example.com"
+      
+      - name: 🔙 Execute Rollback Force
+        run: |
+          echo "=== STARTING FORCE ROLLBACK ==="
           
-      # Step 2: Auto-create Pull Request
-      - name: 📝 Create Pull Request
-        uses: repo-sync/pull-request@v2
-        with:
-          destination_branch: "main"
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          pr_title: "🚀 Rollback to ${{ github.event.inputs.commit_hash }}"
-          pr_body: |
-            Automated rollback to previous stable version.
-            
-            **Target Commit:** ${{ github.event.inputs.commit_hash }}
-            **Created:** $(date)
-            
-            Merge this PR to complete rollback.
-          pr_reviewer: ""
-          pr_assignee: ""
+          # Pastikan di branch main
+          git checkout main
+          
+          # Reset ke commit target
+          git reset --hard 7f4fb63d06f4a60fe822d57733d86317df759f76
+          echo "✓ Reset to target commit"
+          
+          # Force push PAKSA
+          echo "🔄 Force pushing to GitHub..."
+          git push origin main --force
+          
+          echo "✅ ROLLBACK SUCCESS!"
+          echo "Repository rolled back to: 7f4fb63"
+      
+      - name: 🎉 Notify Success
+        run: |
+          echo "================================="
+          echo "🎉 ROLLBACK BERHASIL DILAKUKAN!"
+          echo "================================="
