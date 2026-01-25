@@ -19,12 +19,12 @@ jobs:
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
-        token: ${{ secrets.GITHUB_TOKEN }}
     
     - name: Obfuscate Multiple File Types
       run: |
         # Split extensions from input
-        IFS=',' read -ra EXT_ARRAY <<< "${{ github.event.inputs.extensions || 'py,sh,js' }}"
+        EXTENSIONS="${{ github.event.inputs.extensions || 'py,sh,js' }}"
+        IFS=',' read -ra EXT_ARRAY <<< "$EXTENSIONS"
         
         for ext in "${EXT_ARRAY[@]}"; do
           echo "🧪 Processing .$ext files..."
@@ -37,10 +37,14 @@ jobs:
               sh)
                 # BASH/SH OBFUSCATION
                 encoded=$(base64 -w 0 "$file")
-                cat > "${file}.tmp" << EOF
+                cat > "${file}.tmp" << 'EOF'
 #!/bin/bash
-# 🔥 OBFUSCATED - $(basename "$file")
-eval "\$(echo "$encoded" | base64 -d)"
+# 🔥 OBFUSCATED
+eval "$(base64 -d <<< "
+EOF
+                echo "$encoded" >> "${file}.tmp"
+                cat >> "${file}.tmp" << 'EOF'
+")"
 EOF
                 ;;
                 
@@ -49,7 +53,7 @@ EOF
                 encoded=$(base64 -w 0 "$file")
                 cat > "${file}.tmp" << EOF
 #!/usr/bin/env python3
-# 🔥 OBFUSCATED - $(basename "$file")
+# 🔥 OBFUSCATED
 import base64, sys
 
 CODE = """$encoded"""
@@ -67,9 +71,8 @@ EOF
                 encoded=$(base64 -w 0 "$file")
                 cat > "${file}.tmp" << EOF
 #!/usr/bin/env node
-// 🔥 OBFUSCATED - $(basename "$file")
+// 🔥 OBFUSCATED
 const encoded = "$encoded";
-const Buffer = require('buffer').Buffer;
 
 try {
     eval(Buffer.from(encoded, 'base64').toString());
@@ -78,11 +81,6 @@ try {
     process.exit(1);
 }
 EOF
-                ;;
-                
-              *)
-                echo "⚠️ Unknown extension: .$ext"
-                continue
                 ;;
             esac
             
@@ -94,7 +92,8 @@ EOF
             fi
           done
           
-          echo "📊 Total .$ext files: $(find . -type f -name "*.$ext" ! -path "./.git/*" | wc -l)"
+          count=$(find . -type f -name "*.$ext" ! -path "./.git/*" | wc -l)
+          echo "📊 Total .$ext files: $count"
         done
     
     - name: Commit & Push Changes
@@ -102,12 +101,11 @@ EOF
         git config --global user.name "GitHub Actions Bot"
         git config --global user.email "actions@github.com"
         
-        # Check if there are changes
-        if git diff --quiet && git diff --staged --quiet; then
+        git add -A
+        if git diff --staged --quiet; then
           echo "🤷 No changes to commit"
         else
-          git add -A
-          git commit -m "🌐 Auto-obfuscate: ${{ github.event.inputs.extensions || 'py,sh,js' }} [$(date +'%Y-%m-%d %H:%M:%S')]"
+          git commit -m "🌐 Auto-obfuscate files"
           git push
           echo "🚀 Changes pushed successfully"
         fi
