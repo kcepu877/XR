@@ -1,0 +1,189 @@
+name: 🔓 Quick Deobfuscator
+
+on:
+  workflow_dispatch:
+    inputs:
+      file_types:
+        description: 'File types to decode (comma separated)'
+        required: false
+        default: 'py,sh,js'
+      restore_original:
+        description: 'Restore original files?'
+        required: false
+        default: 'true'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+
+jobs:
+  deobfuscate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Decode Obfuscated Files
+      env:
+        FILE_TYPES: ${{ github.event.inputs.file_types || 'py,sh,js' }}
+        RESTORE: ${{ github.event.inputs.restore_original }}
+      run: |
+        IFS=',' read -ra EXT_ARRAY <<< "$FILE_TYPES"
+        
+        DECODED_COUNT=0
+        FAILED_COUNT=0
+        
+        for ext in "${EXT_ARRAY[@]}"; do
+          echo "🔓 Processing .$ext files..."
+          
+          find . -type f -name "*.$ext" ! -path "./.git/*" ! -path "./decoded_backup/*" | while read -r file; do
+            echo "📁 File: $file"
+            
+            # Check if file is obfuscated by looking for patterns
+            if grep -q "base64.b64decode" "$file" 2>/dev/null || \
+               grep -q "echo.*base64 -d" "$file" 2>/dev/null || \
+               grep -q "Buffer.from.*base64" "$file" 2>/dev/null; then
+              
+              echo "🎯 Obfuscated file detected!"
+              
+              # Create backup before decoding
+              mkdir -p decoded_backup
+              cp "$file" "decoded_backup/$(basename "$file").backup"
+              
+              # Extract and decode based on file type
+              case "$ext" in
+                py)
+                  # Python decoding
+                  if grep -q "base64.b64decode" "$file"; then
+                    # Extract base64 string from file
+                    b64=$(grep -o "base64.b64decode('[^']*'" "$file" | cut -d"'" -f2)
+                    if [ -z "$b64" ]; then
+                      b64=$(grep -o 'base64.b64decode("[^"]*"' "$file" | cut -d'"' -f2)
+                    fi
+                    
+                    if [ -n "$b64" ]; then
+                      # Decode and save
+                      echo "$b64" | base64 -d > "$file.decoded"
+                      mv "$file.decoded" "$file"
+                      echo "✅ Python file decoded"
+                      ((DECODED_COUNT++))
+                    else
+                      echo "❌ Could not extract base64 from Python file"
+                      ((FAILED_COUNT++))
+                    fi
+                  fi
+                  ;;
+                  
+                sh)
+                  # Shell decoding
+                  if grep -q "echo.*base64 -d" "$file"; then
+                    # Extract base64 string (between single quotes)
+                    b64=$(grep -o "echo '[^']*' | base64 -d" "$file" | cut -d"'" -f2)
+                    if [ -z "$b64" ]; then
+                      b64=$(grep -o 'echo "[^"]*" | base64 -d' "$file" | cut -d'"' -f2)
+                    fi
+                    
+                    if [ -n "$b64" ]; then
+                      # Decode and save
+                      echo "$b64" | base64 -d > "$file.decoded"
+                      mv "$file.decoded" "$file"
+                      chmod +x "$file"
+                      echo "✅ Shell file decoded"
+                      ((DECODED_COUNT++))
+                    else
+                      echo "❌ Could not extract base64 from Shell file"
+                      ((FAILED_COUNT++))
+                    fi
+                  fi
+                  ;;
+                  
+                js)
+                  # JavaScript decoding
+                  if grep -q "Buffer.from.*base64" "$file"; then
+                    # Extract base64 string
+                    b64=$(grep -o "Buffer.from('[^']*'" "$file" | cut -d"'" -f2)
+                    if [ -z "$b64" ]; then
+                      b64=$(grep -o 'Buffer.from("[^"]*"' "$file" | cut -d'"' -f2)
+                    fi
+                    
+                    if [ -n "$b64" ]; then
+                      # Decode and save
+                      echo "$b64" | base64 -d > "$file.decoded"
+                      mv "$file.decoded" "$file"
+                      chmod +x "$file"
+                      echo "✅ JavaScript file decoded"
+                      ((DECODED_COUNT++))
+                    else
+                      echo "❌ Could not extract base64 from JS file"
+                      ((FAILED_COUNT++))
+                    fi
+                  fi
+                  ;;
+              esac
+              
+              # Remove shebang if it was added by obfuscator
+              if [ "$RESTORE" = "true" ]; then
+                # Check if first line is shebang
+                first_line=$(head -1 "$file")
+                if [[ "$first_line" == "#!/usr/bin/env"* ]] || [[ "$first_line" == "#!/bin/"* ]]; then
+                  # Remove shebang line
+                  tail -n +2 "$file" > "$file.tmp"
+                  mv "$file.tmp" "$file"
+                  echo "📝 Shebang removed"
+                fi
+              fi
+              
+            else
+              echo "ℹ️ File not obfuscated (no patterns found)"
+            fi
+          done
+        done
+        
+        echo "========================================"
+        echo "📊 DECODING REPORT:"
+        echo "✅ Successfully decoded: $DECODED_COUNT files"
+        echo "❌ Failed to decode: $FAILED_COUNT files"
+        echo "💾 Backups saved in: decoded_backup/"
+        
+        # Show decoded files preview
+        if [ "$DECODED_COUNT" -gt 0 ]; then
+          echo "📄 Sample of decoded files:"
+          find . -name "*.py" -o -name "*.sh" -o -name "*.js" | \
+            head -3 | while read f; do
+            echo "--- $f (first 3 lines) ---"
+            head -3 "$f"
+          done
+        fi
+    
+    - name: Commit Decoded Files
+      if: success()
+      env:
+        RESTORE: ${{ github.event.inputs.restore_original }}
+      run: |
+        git config user.name "Deobfuscator-Bot"
+        git config user.email "deobfuscator@github"
+        
+        # Check if there are changes
+        if git diff --quiet && git diff --staged --quiet; then
+          echo "🤷 No changes to commit"
+        else
+          if [ "$RESTORE" = "true" ]; then
+            commit_msg="🔓 Restore original files from obfuscation"
+          else
+            commit_msg="🔓 Decode obfuscated files"
+          fi
+          
+          git add .
+          git commit -m "$commit_msg"
+          git push
+          echo "🚀 Decoded files pushed to repository"
+        fi
+    
+    - name: Upload Backup as Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: decoded-backups
+        path: decoded_backup/
+        retention-days: 7
