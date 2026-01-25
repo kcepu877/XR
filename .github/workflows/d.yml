@@ -1,0 +1,42 @@
+name: 🔄 One-Click Rollback
+
+on:
+  workflow_dispatch:  # Hanya manual trigger
+
+jobs:
+  rollback:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: ⬇️ Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Ambil semua history
+          token: ${{ secrets.GITHUB_TOKEN }}  # INI SUDAH ADA OTOMATIS!
+
+      - name: ⚙️ Setup Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: 🔙 Rollback to 7f4fb63
+        run: |
+          echo "🎯 Rolling back to commit: 7f4fb63d06f4a60fe822d57733d86317df759f76"
+          
+          # Pindah ke branch main
+          git checkout main
+          
+          # Reset ke commit target
+          git reset --hard 7f4fb63d06f4a60fe822d57733d86317df759f76
+          
+          # Push ke GitHub
+          git push origin main --force
+          
+          echo "✅ Rollback selesai! Repository kembali ke commit 7f4fb63"
+
+      - name: 📝 Buat tag backup
+        run: |
+          TIMESTAMP=$(date +'%Y%m%d-%H%M%S')
+          git tag "backup-$TIMESTAMP"
+          git push origin "backup-$TIMESTAMP"
+          echo "🏷️ Created backup tag: backup-$TIMESTAMP"
