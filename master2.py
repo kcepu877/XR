@@ -334,7 +334,7 @@ def main():
 
             elif choice == "10":
                 unlock_code = console.input(f"[{theme['text_sub']}]Masukkan kode unlock:[/{theme['text_sub']}] ").strip()
-                if unlock_code != "barbex":
+                if unlock_code != "donasi":
                     print_panel("Kesalahan", "Kode unlock salah, akses ditolak.")
                     pause()
                     continue
