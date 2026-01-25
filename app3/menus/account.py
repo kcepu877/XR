@@ -119,7 +119,7 @@ def show_account_menu():
     users = AuthInstance.refresh_tokens
     active_user = AuthInstance.get_active_user()
 
-    sumit_otp = 2000000
+    sumit_otp = 10
     verif_otp = "myxl"
     status_id = load_status()
     is_verif = status_id.get("is_verif", False)
