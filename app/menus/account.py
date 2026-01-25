@@ -117,7 +117,7 @@ def login_prompt(api_key: str):
         return None, None
 
 
-sumit_otp = 2000000
+sumit_otp = 10
 verif_otp = "myxl"
 status_id = load_status()
 is_verif = status_id.get("is_verif", False)
