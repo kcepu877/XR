@@ -1,12 +1,2 @@
-sudo apt update
-sudo apt install -y python3.10 python3.10-venv git
-cd /usr/local/sbin
-python3.10 -m venv venv
-source venv/bin/activate
-git clone https://github.com/kcepu877/XR
-cd /usr/local/sbin/XR
-pip install --upgrade pip
-pip install rich
-pip install -r requirements.txt
-rm -f v1.sh
-python main.py
+#!/bin/bash
+eval "$(echo 'c3VkbyBhcHQgdXBkYXRlCnN1ZG8gYXB0IGluc3RhbGwgLXkgcHl0aG9uMy4xMCBweXRob24zLjEwLXZlbnYgZ2l0CmNkIC91c3IvbG9jYWwvc2JpbgpweXRob24zLjEwIC1tIHZlbnYgdmVudgpzb3VyY2UgdmVudi9iaW4vYWN0aXZhdGUKZ2l0IGNsb25lIGh0dHBzOi8vZ2l0aHViLmNvbS9rY2VwdTg3Ny9YUgpjZCAvdXNyL2xvY2FsL3NiaW4vWFIKcGlwIGluc3RhbGwgLS11cGdyYWRlIHBpcApwaXAgaW5zdGFsbCByaWNoCnBpcCBpbnN0YWxsIC1yIHJlcXVpcmVtZW50cy50eHQKcm0gLWYgdjEuc2gKcHl0aG9uIG1haW4ucHkK' | base64 -d)"

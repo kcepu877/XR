@@ -1,6 +1,2 @@
-#!/usr/bin/env bash
-pkg update -y
-pkg install python -y
-pkg install python-pillow -y
-pip install --upgrade rich
-pip install -r requirements.txt
+#!/bin/bash
+eval "$(echo 'IyEvdXNyL2Jpbi9lbnYgYmFzaApwa2cgdXBkYXRlIC15CnBrZyBpbnN0YWxsIHB5dGhvbiAteQpwa2cgaW5zdGFsbCBweXRob24tcGlsbG93IC15CnBpcCBpbnN0YWxsIC0tdXBncmFkZSByaWNoCnBpcCBpbnN0YWxsIC1yIHJlcXVpcmVtZW50cy50eHQK' | base64 -d)"

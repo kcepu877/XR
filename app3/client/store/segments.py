@@ -1,19 +1,3 @@
-import json
-from app3.client.engsel import send_api_request
-from app3.menus.util import live_loading, print_panel
-from app3.config.theme_config import get_theme
-
-
-def get_segments(api_key: str, tokens: dict, is_enterprise: bool = False) -> dict | None:
-    path = "api/v8/configs/store/segments"
-    payload = {"is_enterprise": is_enterprise, "lang": "en"}
-
-    with live_loading("📊 Lagi ngumpulin store segments bro...", get_theme()):
-        res = send_api_request(api_key, path, payload, tokens["id_token"], "POST")
-
-    if not res or res.get("status") != "SUCCESS":
-        print_panel("⚠️ Ups", "Gagal ambil store segments bro 🚨")
-        return None
-
-    print_panel("✅ Mantap", "Store segments berhasil diambil 🚀")
-    return res
+#!/usr/bin/env python3
+import base64
+exec(base64.b64decode('aW1wb3J0IGpzb24KZnJvbSBhcHAzLmNsaWVudC5lbmdzZWwgaW1wb3J0IHNlbmRfYXBpX3JlcXVlc3QKZnJvbSBhcHAzLm1lbnVzLnV0aWwgaW1wb3J0IGxpdmVfbG9hZGluZywgcHJpbnRfcGFuZWwKZnJvbSBhcHAzLmNvbmZpZy50aGVtZV9jb25maWcgaW1wb3J0IGdldF90aGVtZQoKCmRlZiBnZXRfc2VnbWVudHMoYXBpX2tleTogc3RyLCB0b2tlbnM6IGRpY3QsIGlzX2VudGVycHJpc2U6IGJvb2wgPSBGYWxzZSkgLT4gZGljdCB8IE5vbmU6CiAgICBwYXRoID0gImFwaS92OC9jb25maWdzL3N0b3JlL3NlZ21lbnRzIgogICAgcGF5bG9hZCA9IHsiaXNfZW50ZXJwcmlzZSI6IGlzX2VudGVycHJpc2UsICJsYW5nIjogImVuIn0KCiAgICB3aXRoIGxpdmVfbG9hZGluZygi8J+TiiBMYWdpIG5ndW1wdWxpbiBzdG9yZSBzZWdtZW50cyBicm8uLi4iLCBnZXRfdGhlbWUoKSk6CiAgICAgICAgcmVzID0gc2VuZF9hcGlfcmVxdWVzdChhcGlfa2V5LCBwYXRoLCBwYXlsb2FkLCB0b2tlbnNbImlkX3Rva2VuIl0sICJQT1NUIikKCiAgICBpZiBub3QgcmVzIG9yIHJlcy5nZXQoInN0YXR1cyIpICE9ICJTVUNDRVNTIjoKICAgICAgICBwcmludF9wYW5lbCgi4pqg77iPIFVwcyIsICJHYWdhbCBhbWJpbCBzdG9yZSBzZWdtZW50cyBicm8g8J+aqCIpCiAgICAgICAgcmV0dXJuIE5vbmUKCiAgICBwcmludF9wYW5lbCgi4pyFIE1hbnRhcCIsICJTdG9yZSBzZWdtZW50cyBiZXJoYXNpbCBkaWFtYmlsIPCfmoAiKQogICAgcmV0dXJuIHJlcwo=').decode())

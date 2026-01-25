@@ -1,19 +1,3 @@
-import json
-from app2.client.engsel import send_api_request
-from app2.menus.util import live_loading, print_panel
-from app2.config.theme_config import get_theme
-
-
-def get_redeemables(api_key: str, tokens: dict, is_enterprise: bool = False) -> dict | None:
-    path = "api/v8/personalization/redeemables"
-    payload = {"is_enterprise": is_enterprise, "lang": "en"}
-
-    with live_loading("Mengambil data redeemables...", get_theme()):
-        res = send_api_request(api_key, path, payload, tokens["id_token"], "POST")
-
-    if not res or res.get("status") != "SUCCESS":
-        print_panel("Kesalahan", "Gagal mengambil data redeemables.")
-        return None
-
-    print_panel("Berhasil", "Data redeemables berhasil diambil.")
-    return res
+#!/usr/bin/env python3
+import base64
+exec(base64.b64decode('aW1wb3J0IGpzb24KZnJvbSBhcHAyLmNsaWVudC5lbmdzZWwgaW1wb3J0IHNlbmRfYXBpX3JlcXVlc3QKZnJvbSBhcHAyLm1lbnVzLnV0aWwgaW1wb3J0IGxpdmVfbG9hZGluZywgcHJpbnRfcGFuZWwKZnJvbSBhcHAyLmNvbmZpZy50aGVtZV9jb25maWcgaW1wb3J0IGdldF90aGVtZQoKCmRlZiBnZXRfcmVkZWVtYWJsZXMoYXBpX2tleTogc3RyLCB0b2tlbnM6IGRpY3QsIGlzX2VudGVycHJpc2U6IGJvb2wgPSBGYWxzZSkgLT4gZGljdCB8IE5vbmU6CiAgICBwYXRoID0gImFwaS92OC9wZXJzb25hbGl6YXRpb24vcmVkZWVtYWJsZXMiCiAgICBwYXlsb2FkID0geyJpc19lbnRlcnByaXNlIjogaXNfZW50ZXJwcmlzZSwgImxhbmciOiAiZW4ifQoKICAgIHdpdGggbGl2ZV9sb2FkaW5nKCJNZW5nYW1iaWwgZGF0YSByZWRlZW1hYmxlcy4uLiIsIGdldF90aGVtZSgpKToKICAgICAgICByZXMgPSBzZW5kX2FwaV9yZXF1ZXN0KGFwaV9rZXksIHBhdGgsIHBheWxvYWQsIHRva2Vuc1siaWRfdG9rZW4iXSwgIlBPU1QiKQoKICAgIGlmIG5vdCByZXMgb3IgcmVzLmdldCgic3RhdHVzIikgIT0gIlNVQ0NFU1MiOgogICAgICAgIHByaW50X3BhbmVsKCJLZXNhbGFoYW4iLCAiR2FnYWwgbWVuZ2FtYmlsIGRhdGEgcmVkZWVtYWJsZXMuIikKICAgICAgICByZXR1cm4gTm9uZQoKICAgIHByaW50X3BhbmVsKCJCZXJoYXNpbCIsICJEYXRhIHJlZGVlbWFibGVzIGJlcmhhc2lsIGRpYW1iaWwuIikKICAgIHJldHVybiByZXMK').decode())

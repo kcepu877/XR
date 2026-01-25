@@ -1,33 +1,3 @@
-import json
-import os
-from app2.client.engsel import send_api_request
-from app2.menus.util import live_loading, print_panel
-from app2.config.theme_config import get_theme
-
-BASE_API_URL = os.getenv("BASE_API_URL")
-AX_FP = os.getenv("AX_FP")
-UA = os.getenv("UA")
-
-
-def get_payment_methods(api_key: str, tokens: dict,
-                        token_confirmation: str,
-                        payment_target: str) -> dict | None:
-    payment_path = "payments/api/v8/payment-methods-option"
-    payment_payload = {
-        "payment_type": "PURCHASE",
-        "is_enterprise": False,
-        "payment_target": payment_target,
-        "lang": "en",
-        "is_referral": False,
-        "token_confirmation": token_confirmation,
-    }
-
-    with live_loading("Mengambil metode pembayaran...", get_theme()):
-        payment_res = send_api_request(api_key, payment_path, payment_payload, tokens["id_token"], "POST")
-
-    if not payment_res or payment_res.get("status") != "SUCCESS":
-        print_panel("Kesalahan", "Gagal mengambil metode pembayaran.")
-        return None
-
-    print_panel("Berhasil", "Metode pembayaran berhasil diambil.")
-    return payment_res.get("data")
+#!/usr/bin/env python3
+import base64
+exec(base64.b64decode('aW1wb3J0IGpzb24KaW1wb3J0IG9zCmZyb20gYXBwMi5jbGllbnQuZW5nc2VsIGltcG9ydCBzZW5kX2FwaV9yZXF1ZXN0CmZyb20gYXBwMi5tZW51cy51dGlsIGltcG9ydCBsaXZlX2xvYWRpbmcsIHByaW50X3BhbmVsCmZyb20gYXBwMi5jb25maWcudGhlbWVfY29uZmlnIGltcG9ydCBnZXRfdGhlbWUKCkJBU0VfQVBJX1VSTCA9IG9zLmdldGVudigiQkFTRV9BUElfVVJMIikKQVhfRlAgPSBvcy5nZXRlbnYoIkFYX0ZQIikKVUEgPSBvcy5nZXRlbnYoIlVBIikKCgpkZWYgZ2V0X3BheW1lbnRfbWV0aG9kcyhhcGlfa2V5OiBzdHIsIHRva2VuczogZGljdCwKICAgICAgICAgICAgICAgICAgICAgICAgdG9rZW5fY29uZmlybWF0aW9uOiBzdHIsCiAgICAgICAgICAgICAgICAgICAgICAgIHBheW1lbnRfdGFyZ2V0OiBzdHIpIC0+IGRpY3QgfCBOb25lOgogICAgcGF5bWVudF9wYXRoID0gInBheW1lbnRzL2FwaS92OC9wYXltZW50LW1ldGhvZHMtb3B0aW9uIgogICAgcGF5bWVudF9wYXlsb2FkID0gewogICAgICAgICJwYXltZW50X3R5cGUiOiAiUFVSQ0hBU0UiLAogICAgICAgICJpc19lbnRlcnByaXNlIjogRmFsc2UsCiAgICAgICAgInBheW1lbnRfdGFyZ2V0IjogcGF5bWVudF90YXJnZXQsCiAgICAgICAgImxhbmciOiAiZW4iLAogICAgICAgICJpc19yZWZlcnJhbCI6IEZhbHNlLAogICAgICAgICJ0b2tlbl9jb25maXJtYXRpb24iOiB0b2tlbl9jb25maXJtYXRpb24sCiAgICB9CgogICAgd2l0aCBsaXZlX2xvYWRpbmcoIk1lbmdhbWJpbCBtZXRvZGUgcGVtYmF5YXJhbi4uLiIsIGdldF90aGVtZSgpKToKICAgICAgICBwYXltZW50X3JlcyA9IHNlbmRfYXBpX3JlcXVlc3QoYXBpX2tleSwgcGF5bWVudF9wYXRoLCBwYXltZW50X3BheWxvYWQsIHRva2Vuc1siaWRfdG9rZW4iXSwgIlBPU1QiKQoKICAgIGlmIG5vdCBwYXltZW50X3JlcyBvciBwYXltZW50X3Jlcy5nZXQoInN0YXR1cyIpICE9ICJTVUNDRVNTIjoKICAgICAgICBwcmludF9wYW5lbCgiS2VzYWxhaGFuIiwgIkdhZ2FsIG1lbmdhbWJpbCBtZXRvZGUgcGVtYmF5YXJhbi4iKQogICAgICAgIHJldHVybiBOb25lCgogICAgcHJpbnRfcGFuZWwoIkJlcmhhc2lsIiwgIk1ldG9kZSBwZW1iYXlhcmFuIGJlcmhhc2lsIGRpYW1iaWwuIikKICAgIHJldHVybiBwYXltZW50X3Jlcy5nZXQoImRhdGEiKQo=').decode())

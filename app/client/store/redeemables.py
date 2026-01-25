@@ -1,20 +1,3 @@
-from app.client.engsel import send_api_request
-
-def get_redeemables(
-    api_key: str,
-    tokens: dict,
-    is_enterprise: bool = False,
-):
-    path = "api/v8/personalization/redeemables"
-    payload = {
-        "is_enterprise": is_enterprise,
-        "lang": "en"
-    }
-    
-    res = send_api_request(api_key, path, payload, tokens["id_token"], "POST")
-    if res["status"] != "SUCCESS":
-        print("Failed to fetch redemable.")
-        print(f"Error: {res}")
-        return None
-    
-    return res
+#!/usr/bin/env python3
+import base64
+exec(base64.b64decode('ZnJvbSBhcHAuY2xpZW50LmVuZ3NlbCBpbXBvcnQgc2VuZF9hcGlfcmVxdWVzdAoKZGVmIGdldF9yZWRlZW1hYmxlcygKICAgIGFwaV9rZXk6IHN0ciwKICAgIHRva2VuczogZGljdCwKICAgIGlzX2VudGVycHJpc2U6IGJvb2wgPSBGYWxzZSwKKToKICAgIHBhdGggPSAiYXBpL3Y4L3BlcnNvbmFsaXphdGlvbi9yZWRlZW1hYmxlcyIKICAgIHBheWxvYWQgPSB7CiAgICAgICAgImlzX2VudGVycHJpc2UiOiBpc19lbnRlcnByaXNlLAogICAgICAgICJsYW5nIjogImVuIgogICAgfQogICAgCiAgICByZXMgPSBzZW5kX2FwaV9yZXF1ZXN0KGFwaV9rZXksIHBhdGgsIHBheWxvYWQsIHRva2Vuc1siaWRfdG9rZW4iXSwgIlBPU1QiKQogICAgaWYgcmVzWyJzdGF0dXMiXSAhPSAiU1VDQ0VTUyI6CiAgICAgICAgcHJpbnQoIkZhaWxlZCB0byBmZXRjaCByZWRlbWFibGUuIikKICAgICAgICBwcmludChmIkVycm9yOiB7cmVzfSIpCiAgICAgICAgcmV0dXJuIE5vbmUKICAgIAogICAgcmV0dXJuIHJlcw==').decode())

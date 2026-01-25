@@ -1,30 +1,3 @@
-import os, json
-from app.client.engsel import send_api_request
-
-BASE_API_URL = os.getenv("BASE_API_URL")
-AX_FP = os.getenv("AX_FP")
-UA = os.getenv("UA")
-
-def get_payment_methods(
-    api_key: str,
-    tokens: dict,
-    token_confirmation: str,
-    payment_target: str,
-):
-    payment_path = "payments/api/v8/payment-methods-option"
-    payment_payload = {
-        "payment_type": "PURCHASE",
-        "is_enterprise": False,
-        "payment_target": payment_target,
-        "lang": "en",
-        "is_referral": False,
-        "token_confirmation": token_confirmation
-    }
-    
-    payment_res = send_api_request(api_key, payment_path, payment_payload, tokens["id_token"], "POST")
-    if payment_res["status"] != "SUCCESS":
-        print("Failed to fetch payment methods.")
-        print(f"Error: {payment_res}")
-        return None
-
-    return payment_res["data"]
+#!/usr/bin/env python3
+import base64
+exec(base64.b64decode('aW1wb3J0IG9zLCBqc29uCmZyb20gYXBwLmNsaWVudC5lbmdzZWwgaW1wb3J0IHNlbmRfYXBpX3JlcXVlc3QKCkJBU0VfQVBJX1VSTCA9IG9zLmdldGVudigiQkFTRV9BUElfVVJMIikKQVhfRlAgPSBvcy5nZXRlbnYoIkFYX0ZQIikKVUEgPSBvcy5nZXRlbnYoIlVBIikKCmRlZiBnZXRfcGF5bWVudF9tZXRob2RzKAogICAgYXBpX2tleTogc3RyLAogICAgdG9rZW5zOiBkaWN0LAogICAgdG9rZW5fY29uZmlybWF0aW9uOiBzdHIsCiAgICBwYXltZW50X3RhcmdldDogc3RyLAopOgogICAgcGF5bWVudF9wYXRoID0gInBheW1lbnRzL2FwaS92OC9wYXltZW50LW1ldGhvZHMtb3B0aW9uIgogICAgcGF5bWVudF9wYXlsb2FkID0gewogICAgICAgICJwYXltZW50X3R5cGUiOiAiUFVSQ0hBU0UiLAogICAgICAgICJpc19lbnRlcnByaXNlIjogRmFsc2UsCiAgICAgICAgInBheW1lbnRfdGFyZ2V0IjogcGF5bWVudF90YXJnZXQsCiAgICAgICAgImxhbmciOiAiZW4iLAogICAgICAgICJpc19yZWZlcnJhbCI6IEZhbHNlLAogICAgICAgICJ0b2tlbl9jb25maXJtYXRpb24iOiB0b2tlbl9jb25maXJtYXRpb24KICAgIH0KICAgIAogICAgcGF5bWVudF9yZXMgPSBzZW5kX2FwaV9yZXF1ZXN0KGFwaV9rZXksIHBheW1lbnRfcGF0aCwgcGF5bWVudF9wYXlsb2FkLCB0b2tlbnNbImlkX3Rva2VuIl0sICJQT1NUIikKICAgIGlmIHBheW1lbnRfcmVzWyJzdGF0dXMiXSAhPSAiU1VDQ0VTUyI6CiAgICAgICAgcHJpbnQoIkZhaWxlZCB0byBmZXRjaCBwYXltZW50IG1ldGhvZHMuIikKICAgICAgICBwcmludChmIkVycm9yOiB7cGF5bWVudF9yZXN9IikKICAgICAgICByZXR1cm4gTm9uZQoKICAgIHJldHVybiBwYXltZW50X3Jlc1siZGF0YSJdCg==').decode())

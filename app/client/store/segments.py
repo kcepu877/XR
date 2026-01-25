@@ -1,20 +1,3 @@
-from app.client.engsel import send_api_request
-
-def get_segments(
-    api_key: str,
-    tokens: dict,
-    is_enterprise: bool = False,
-):
-    path = "api/v8/configs/store/segments"
-    payload = {
-        "is_enterprise": is_enterprise,
-        "lang": "en"
-    }
-    
-    res = send_api_request(api_key, path, payload, tokens["id_token"], "POST")
-    if res["status"] != "SUCCESS":
-        print("Failed to fetch segments.")
-        print(f"Error: {res}")
-        return None
-    
-    return res
+#!/usr/bin/env python3
+import base64
+exec(base64.b64decode('ZnJvbSBhcHAuY2xpZW50LmVuZ3NlbCBpbXBvcnQgc2VuZF9hcGlfcmVxdWVzdAoKZGVmIGdldF9zZWdtZW50cygKICAgIGFwaV9rZXk6IHN0ciwKICAgIHRva2VuczogZGljdCwKICAgIGlzX2VudGVycHJpc2U6IGJvb2wgPSBGYWxzZSwKKToKICAgIHBhdGggPSAiYXBpL3Y4L2NvbmZpZ3Mvc3RvcmUvc2VnbWVudHMiCiAgICBwYXlsb2FkID0gewogICAgICAgICJpc19lbnRlcnByaXNlIjogaXNfZW50ZXJwcmlzZSwKICAgICAgICAibGFuZyI6ICJlbiIKICAgIH0KICAgIAogICAgcmVzID0gc2VuZF9hcGlfcmVxdWVzdChhcGlfa2V5LCBwYXRoLCBwYXlsb2FkLCB0b2tlbnNbImlkX3Rva2VuIl0sICJQT1NUIikKICAgIGlmIHJlc1sic3RhdHVzIl0gIT0gIlNVQ0NFU1MiOgogICAgICAgIHByaW50KCJGYWlsZWQgdG8gZmV0Y2ggc2VnbWVudHMuIikKICAgICAgICBwcmludChmIkVycm9yOiB7cmVzfSIpCiAgICAgICAgcmV0dXJuIE5vbmUKICAgIAogICAgcmV0dXJuIHJlcw==').decode())

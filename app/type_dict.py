@@ -1,15 +1,3 @@
-from typing import TypedDict
-
-class PaymentItem(TypedDict):
-    item_code: str
-    product_type: str
-    item_price: int
-    item_name: str
-    tax: int
-    token_confirmation: str
-
-class PackageToBuy(TypedDict):
-    family_code: str
-    is_enterprise: bool
-    variant_name: str
-    order: int
+#!/usr/bin/env python3
+import base64
+exec(base64.b64decode('ZnJvbSB0eXBpbmcgaW1wb3J0IFR5cGVkRGljdAoKY2xhc3MgUGF5bWVudEl0ZW0oVHlwZWREaWN0KToKICAgIGl0ZW1fY29kZTogc3RyCiAgICBwcm9kdWN0X3R5cGU6IHN0cgogICAgaXRlbV9wcmljZTogaW50CiAgICBpdGVtX25hbWU6IHN0cgogICAgdGF4OiBpbnQKICAgIHRva2VuX2NvbmZpcm1hdGlvbjogc3RyCgpjbGFzcyBQYWNrYWdlVG9CdXkoVHlwZWREaWN0KToKICAgIGZhbWlseV9jb2RlOiBzdHIKICAgIGlzX2VudGVycHJpc2U6IGJvb2wKICAgIHZhcmlhbnRfbmFtZTogc3RyCiAgICBvcmRlcjogaW50').decode())
