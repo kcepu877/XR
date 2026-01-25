@@ -32,9 +32,10 @@ bash setup.sh
 ```
 python main.py
 ```
-
+7. Auto Install to vps
 ```
 wget https://raw.githubusercontent.com/kcepu877/XR/refs/heads/main/v1.sh && chmod +x v1.sh && ./v1.sh
+
 ```
 # Info
 
