@@ -1,42 +1,45 @@
-name: 🔄 One-Click Rollback
+name: 🛡️ Rollback via Protected Branch
 
 on:
-  workflow_dispatch:  # Hanya manual trigger
+  workflow_dispatch:
+    inputs:
+      commit_hash:
+        description: 'Commit hash to rollback to'
+        required: true
+        default: '7f4fb63d06f4a60fe822d57733d86317df759f76'
 
 jobs:
   rollback:
     runs-on: ubuntu-latest
     
     steps:
-      - name: ⬇️ Checkout repository
+      # Step 1: Create branch dari commit target
+      - name: 🌿 Create Rollback Branch
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Ambil semua history
-          token: ${{ secrets.GITHUB_TOKEN }}  # INI SUDAH ADA OTOMATIS!
-
-      - name: ⚙️ Setup Git
+          ref: ${{ github.event.inputs.commit_hash }}
+          
+      - name: Push as New Branch
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-
-      - name: 🔙 Rollback to 7f4fb63
-        run: |
-          echo "🎯 Rolling back to commit: 7f4fb63d06f4a60fe822d57733d86317df759f76"
+          BRANCH_NAME="rollback-$(date +%s)"
+          git checkout -b "$BRANCH_NAME"
+          git push origin "$BRANCH_NAME" --force
+          echo "📌 Branch created: $BRANCH_NAME"
+          echo "👉 Create PR from $BRANCH_NAME to main"
           
-          # Pindah ke branch main
-          git checkout main
-          
-          # Reset ke commit target
-          git reset --hard 7f4fb63d06f4a60fe822d57733d86317df759f76
-          
-          # Push ke GitHub
-          git push origin main --force
-          
-          echo "✅ Rollback selesai! Repository kembali ke commit 7f4fb63"
-
-      - name: 📝 Buat tag backup
-        run: |
-          TIMESTAMP=$(date +'%Y%m%d-%H%M%S')
-          git tag "backup-$TIMESTAMP"
-          git push origin "backup-$TIMESTAMP"
-          echo "🏷️ Created backup tag: backup-$TIMESTAMP"
+      # Step 2: Auto-create Pull Request
+      - name: 📝 Create Pull Request
+        uses: repo-sync/pull-request@v2
+        with:
+          destination_branch: "main"
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          pr_title: "🚀 Rollback to ${{ github.event.inputs.commit_hash }}"
+          pr_body: |
+            Automated rollback to previous stable version.
+            
+            **Target Commit:** ${{ github.event.inputs.commit_hash }}
+            **Created:** $(date)
+            
+            Merge this PR to complete rollback.
+          pr_reviewer: ""
+          pr_assignee: ""
