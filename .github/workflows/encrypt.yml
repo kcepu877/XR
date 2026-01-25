@@ -1,111 +1,50 @@
-name: 🌐 Universal Code Obfuscator
+name: ⚡ Quick Obfuscator
 
 on:
   workflow_dispatch:
-    inputs:
-      extensions:
-        description: 'File extensions to process (comma separated)'
-        required: false
-        default: 'py,sh,js'
 
 jobs:
-  obfuscate-all:
+  obfuscate:
     runs-on: ubuntu-latest
     permissions:
       contents: write
     
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
+    - uses: actions/checkout@v4
     
-    - name: Obfuscate Multiple File Types
+    - name: Obfuscate Files
       run: |
-        # Split extensions from input
-        EXTENSIONS="${{ github.event.inputs.extensions || 'py,sh,js' }}"
-        IFS=',' read -ra EXT_ARRAY <<< "$EXTENSIONS"
+        # Process Python files
+        for file in $(find . -name "*.py" ! -path "./.git/*"); do
+          echo "Processing Python: $file"
+          b64=$(base64 -w 0 "$file")
+          echo -e "#!/usr/bin/env python3\nimport base64\nexec(base64.b64decode('$b64').decode())" > "$file.new"
+          mv "$file.new" "$file"
+          chmod +x "$file"
+        done
         
-        for ext in "${EXT_ARRAY[@]}"; do
-          echo "🧪 Processing .$ext files..."
-          
-          # Find all files with this extension
-          find . -type f -name "*.$ext" ! -path "./.git/*" | while read -r file; do
-            echo "🔧 Processing: $file"
-            
-            case "$ext" in
-              sh)
-                # BASH/SH OBFUSCATION
-                encoded=$(base64 -w 0 "$file")
-                cat > "${file}.tmp" << 'EOF'
-#!/bin/bash
-# 🔥 OBFUSCATED
-eval "$(base64 -d <<< "
-EOF
-                echo "$encoded" >> "${file}.tmp"
-                cat >> "${file}.tmp" << 'EOF'
-")"
-EOF
-                ;;
-                
-              py)
-                # PYTHON OBFUSCATION
-                encoded=$(base64 -w 0 "$file")
-                cat > "${file}.tmp" << EOF
-#!/usr/bin/env python3
-# 🔥 OBFUSCATED
-import base64, sys
-
-CODE = """$encoded"""
-
-try:
-    exec(base64.b64decode(CODE).decode('utf-8'))
-except Exception as e:
-    print(f"[Obfuscation Error] {e}")
-    sys.exit(1)
-EOF
-                ;;
-                
-              js)
-                # JAVASCRIPT OBFUSCATION
-                encoded=$(base64 -w 0 "$file")
-                cat > "${file}.tmp" << EOF
-#!/usr/bin/env node
-// 🔥 OBFUSCATED
-const encoded = "$encoded";
-
-try {
-    eval(Buffer.from(encoded, 'base64').toString());
-} catch(e) {
-    console.error("[Obfuscation Error]", e);
-    process.exit(1);
-}
-EOF
-                ;;
-            esac
-            
-            # Replace original file
-            if [ -f "${file}.tmp" ]; then
-              mv -f "${file}.tmp" "$file"
-              chmod +x "$file"
-              echo "✅ Obfuscated: $file"
-            fi
-          done
-          
-          count=$(find . -type f -name "*.$ext" ! -path "./.git/*" | wc -l)
-          echo "📊 Total .$ext files: $count"
+        # Process Shell files
+        for file in $(find . -name "*.sh" ! -path "./.git/*"); do
+          echo "Processing Shell: $file"
+          b64=$(base64 -w 0 "$file")
+          echo -e "#!/bin/bash\neval \"\$(echo '$b64' | base64 -d)\"" > "$file.new"
+          mv "$file.new" "$file"
+          chmod +x "$file"
+        done
+        
+        # Process JavaScript files
+        for file in $(find . -name "*.js" ! -path "./.git/*"); do
+          echo "Processing JS: $file"
+          b64=$(base64 -w 0 "$file")
+          echo -e "#!/usr/bin/env node\nconst b='$b64';\neval(Buffer.from(b,'base64').toString())" > "$file.new"
+          mv "$file.new" "$file"
+          chmod +x "$file"
         done
     
-    - name: Commit & Push Changes
+    - name: Push Changes
       run: |
-        git config --global user.name "GitHub Actions Bot"
-        git config --global user.email "actions@github.com"
-        
-        git add -A
-        if git diff --staged --quiet; then
-          echo "🤷 No changes to commit"
-        else
-          git commit -m "🌐 Auto-obfuscate files"
-          git push
-          echo "🚀 Changes pushed successfully"
-        fi
+        git config user.name "Obfuscator-Bot"
+        git config user.email "bot@github"
+        git add .
+        git commit -m "⚡ Obfuscate files" || echo "No changes"
+        git push
