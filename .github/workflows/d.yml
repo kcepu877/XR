@@ -1,44 +1,39 @@
-name: 🚀 Rollback dengan Token Khusus
+name: 🎯 ONE-CLICK ROLLBACK
 
 on:
-  workflow_dispatch:  # Hanya manual trigger
+  workflow_dispatch:
 
 jobs:
-  force-rollback:
+  rollback:
     runs-on: ubuntu-latest
     
     steps:
-      - name: 📥 Checkout dengan Token Khusus
+      # STEP 1: Checkout dengan token
+      - name: 📥 Checkout Repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          token: ${{ secrets.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 }}  # <- Token Anda di sini
+          token: ${{ secrets.GITHARD }}  # <-- PASTIKAN INI ADA!
       
+      # STEP 2: Setup git
       - name: 🛠️ Setup Git
         run: |
           git config --global user.name "Rollback Bot"
-          git config --global user.email "bot@example.com"
+          git config --global user.email "rollback@github.com"
       
-      - name: 🔙 Execute Rollback Force
+      # STEP 3: Execute rollback
+      - name: 🔙 FORCE ROLLBACK
         run: |
-          echo "=== STARTING FORCE ROLLBACK ==="
+          echo "🚀 STARTING ROLLBACK..."
+          echo "Target: 7f4fb63d06f4a60fe822d57733d86317df759f76"
           
-          # Pastikan di branch main
+          # Switch to main
           git checkout main
           
-          # Reset ke commit target
+          # Reset to target
           git reset --hard 7f4fb63d06f4a60fe822d57733d86317df759f76
-          echo "✓ Reset to target commit"
           
-          # Force push PAKSA
-          echo "🔄 Force pushing to GitHub..."
+          # Force push
           git push origin main --force
           
-          echo "✅ ROLLBACK SUCCESS!"
-          echo "Repository rolled back to: 7f4fb63"
-      
-      - name: 🎉 Notify Success
-        run: |
-          echo "================================="
-          echo "🎉 ROLLBACK BERHASIL DILAKUKAN!"
-          echo "================================="
+          echo "✅ ROLLBACK COMPLETE!"
