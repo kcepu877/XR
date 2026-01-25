@@ -13,7 +13,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          token: ${{ secrets.GITHARD }}  # <-- PASTIKAN INI ADA!
+          token: ${{ secrets.GHP_TOKEN }}  # <-- PASTIKAN INI ADA!
       
       # STEP 2: Setup git
       - name: 🛠️ Setup Git
